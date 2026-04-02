@@ -1,0 +1,34 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "src": "src/pages/Home.tsx"
+    },
+    {
+      "path": "/categories",
+      "src": "src/pages/Categories.tsx"
+    },
+    {
+      "path": "/game-detail",
+      "src": "src/pages/GameDetail.tsx"
+    },
+    {
+      "path": "/beginners",
+      "src": "src/pages/BeginnersGuide.tsx"
+    },
+    {
+      "path": "/trending",
+      "src": "src/pages/Trending.tsx"
+    },
+    {
+      "path": "/about",
+      "src": "src/pages/About.tsx"
+    }
+  ],
+  "components": [
+    {"name": "Layout", "src": "src/components/Layout.tsx"},
+    {"name": "Header", "src": "src/components/Header.tsx"},
+    {"name": "Footer", "src": "src/components/Footer.tsx"},
+    {"name": "GameCard", "src": "src/components/GameCard.tsx"}
+  ]
+}

@@ -1,0 +1,133 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: "Poppins-Regular_6";
+  src: url("/fonts/Poppins-Regular_6.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --font-sans: var(--fontSans);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --shadow-x: var(--shadow-x);
+  --shadow-y: var(--shadow-y);
+  --shadow-blur: var(--shadow-blur);
+  --shadow-spread: var(--shadow-spread);
+  --shadow-color: var(--shadow-color);
+}
+
+:root {
+  --fontSans: "Poppins-Regular_6", system-ui, sans-serif;
+  --radius: 1.5rem; /* Large rounded corners for playful look */
+  
+  /* Primary: Bright Orange */
+  --primary: rgba(255, 127, 80, 1);
+  --primary-foreground: rgba(255, 255, 255, 1);
+  
+  /* Secondary: Light Blue */
+  --secondary: rgba(135, 206, 235, 1);
+  --secondary-foreground: rgba(30, 30, 30, 1);
+  
+  /* Backgrounds */
+  --background: rgba(250, 252, 255, 1); /* Very light blue-ish white */
+  --foreground: rgba(40, 40, 40, 1);
+  --card: rgba(255, 255, 255, 1);
+  --card-foreground: rgba(40, 40, 40, 1);
+  
+  --muted: rgba(240, 244, 248, 1);
+  --muted-foreground: rgba(100, 110, 120, 1);
+  
+  --accent: rgba(255, 245, 240, 1); /* Very light orange for accents */
+  --accent-foreground: rgba(255, 127, 80, 1);
+  
+  --destructive: rgba(248, 71, 33, 1);
+  --border: rgba(230, 235, 240, 1);
+  --ring: rgba(255, 127, 80, 0.5);
+  
+  /* Custom playful shadow */
+  --shadow-x: 0px;
+  --shadow-y: 8px;
+  --shadow-blur: 24px;
+  --shadow-spread: -4px;
+  --shadow-color: rgba(255, 127, 80, 0.15); /* Orange tinted shadow */
+}
+
+.dark {
+  /* Keeping dark mode similar but darker, though focus is on bright UI */
+  --background: rgba(20, 20, 25, 1);
+  --foreground: rgba(250, 250, 250, 1);
+  --card: rgba(30, 30, 35, 1);
+  --card-foreground: rgba(250, 250, 250, 1);
+  --primary: rgba(255, 140, 100, 1);
+  --secondary: rgba(100, 180, 220, 1);
+  --muted: rgba(40, 40, 45, 1);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary selection:text-white;
+  }
+}
+
+@layer utilities {
+  .shadow-custom {
+    box-shadow: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) var(--shadow-color);
+  }
+  
+  /* Playful Wiggle Animation */
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+  
+  .hover-wiggle:hover {
+    animation: wiggle 0.3s ease-in-out infinite;
+  }
+  
+  /* Bounce button effect */
+  .btn-bounce {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn-bounce:active {
+    transform: scale(0.92);
+  }
+  
+  /* Hide scrollbar for clean filter lists */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
