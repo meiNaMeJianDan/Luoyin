@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import GameCard from '../components/GameCard';
-import { GAME_TYPES, PLAYER_COUNTS, GAME_DURATIONS, MERGED_GAMES } from '@/constant';
+import { useAllGames, useCategoryOptions } from '@/hooks/useGameData';
+import { BASE_URL } from '@/api/client';
 
 const Categories = () => {
   const [activeType, setActiveType] = useState('全部');
@@ -11,13 +12,14 @@ const Categories = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  // 使用从data文件导入的静态数据
-  const types = GAME_TYPES;
-  const playerCounts = PLAYER_COUNTS;
-  const durations = GAME_DURATIONS;
+  // 从 API 获取所有游戏和分类筛选选项
+  const { data: allGames, isLoading: gamesLoading, error: gamesError } = useAllGames();
+  const { data: categoryOptions, isLoading: optionsLoading, error: optionsError } = useCategoryOptions();
 
-  // 使用统一管理的游戏数据
-  const allGames = MERGED_GAMES;
+  // 从分类选项中提取筛选数据，提供默认值
+  const types = categoryOptions?.types ?? [];
+  const playerCounts = categoryOptions?.playerCounts ?? [];
+  const durations = categoryOptions?.durations ?? [];
 
   // 解析玩家人数字符串为最小值和最大值
   const parsePlayers = (players: string): { min: number; max: number } => {
@@ -78,7 +80,7 @@ const Categories = () => {
   };
 
   // 完整的筛选逻辑
-  const filteredGames = allGames.filter(game => {
+  const filteredGames = (allGames ?? []).filter(game => {
     const matchType = activeType === '全部' || game.type === activeType;
     const matchPlayersFilter = matchPlayers(game.players, activePlayers);
     const matchDurationFilter = matchDuration(game.time, activeDuration);
@@ -98,13 +100,34 @@ const Categories = () => {
     setCurrentPage(1);
   }, [activeType, activePlayers, activeDuration, searchQuery]);
 
+  // 加载状态
+  const isLoading = gamesLoading || optionsLoading;
+  // 错误状态
+  const hasError = gamesError || optionsError;
+
+  if (isLoading) {
+    return (
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center min-h-[400px]">
+        <div className="text-center text-muted-foreground">加载中...</div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center min-h-[400px]">
+        <div className="text-center text-destructive">加载数据失败，请稍后重试</div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
       
-      {/* Sidebar / Filters (Mobile top, Desktop left) */}
+      {/* 侧边栏 / 筛选器（移动端顶部，桌面端左侧） */}
       <aside className="w-full md:w-64 flex-shrink-0 flex flex-col gap-6">
         
-        {/* Search */}
+        {/* 搜索框 */}
         <div className="relative">
           <input 
             type="text" 
@@ -116,14 +139,14 @@ const Categories = () => {
           <Search size={20} className="absolute left-3 top-3.5 text-muted-foreground" />
         </div>
 
-        {/* Filters */}
+        {/* 筛选条件 */}
         <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col gap-6">
           <div className="flex items-center gap-2 font-bold text-lg text-foreground border-b border-border pb-4">
             <Filter size={20} className="text-primary" />
             筛选条件
           </div>
 
-          {/* Type Filter */}
+          {/* 桌游类型筛选 */}
           <div>
             <h4 className="font-semibold mb-3 text-foreground">桌游类型</h4>
             <div className="flex flex-wrap gap-2">
@@ -143,7 +166,7 @@ const Categories = () => {
             </div>
           </div>
 
-          {/* Player Count Filter */}
+          {/* 玩家人数筛选 */}
           <div>
             <h4 className="font-semibold mb-3 text-foreground">玩家人数</h4>
             <div className="flex flex-wrap gap-2">
@@ -159,7 +182,7 @@ const Categories = () => {
             </div>
           </div>
 
-          {/* Duration Filter */}
+          {/* 游戏时长筛选 */}
           <div>
             <h4 className="font-semibold mb-3 text-foreground">游戏时长</h4>
             <div className="flex flex-wrap gap-2">
@@ -178,7 +201,7 @@ const Categories = () => {
         </div>
       </aside>
 
-      {/* Main Content: Grid */}
+      {/* 主内容区：游戏卡片网格 */}
       <main className="flex-grow">
         <div className="mb-6 flex justify-between items-end">
           <h1 className="text-3xl font-black text-foreground">
@@ -191,15 +214,15 @@ const Categories = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedGames.map((game, idx) => (
-                <GameCard key={idx} {...game}/>
+                <GameCard key={idx} {...game} image={`${BASE_URL}${game.image}`} />
               ))}
             </div>
 
-            {/* Pagination Component */}
+            {/* 分页组件 */}
             {totalPages > 1 && (
               <div className="mt-12 flex justify-center">
                 <div className="inline-flex items-center gap-1">
-                  {/* Previous Button */}
+                  {/* 上一页按钮 */}
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
@@ -208,7 +231,7 @@ const Categories = () => {
                     上一页
                   </button>
 
-                  {/* Page Numbers */}
+                  {/* 页码 */}
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                     <button
                       key={page}
@@ -219,7 +242,7 @@ const Categories = () => {
                     </button>
                   ))}
 
-                  {/* Next Button */}
+                  {/* 下一页按钮 */}
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Users, Clock, Star, Flame, Target, MessageSquare, AlertCircle, BookmarkPlus } from 'lucide-react';
-import GameCard from '../components/GameCard';
+import { Users, Clock, Star, Flame, Target, MessageSquare, AlertCircle } from 'lucide-react';
 import ImageViewer from '../components/ImageViewer';
-import { ALL_GAMES, GAME_DETAILS } from '@/constant';
+import { useGameById, useGameDetails } from '@/hooks/useGameData';
+import { BASE_URL } from '@/api/client';
 
 const GameDetail = () => {
   // 获取URL中的游戏ID参数
@@ -12,24 +12,9 @@ const GameDetail = () => {
   // 将ID转换为数字类型
   const gameId = id ? parseInt(id, 10) : 0;
 
-  // 根据ID从游戏数据中找到对应的游戏
-  const game = ALL_GAMES.find(g => g.id === gameId);
-
-  // 如果游戏不存在，显示错误信息
-  if (!game) {
-    return (
-      <div className="w-full flex flex-col items-center justify-center gap-8 py-16">
-        <AlertCircle size={64} className="text-destructive" />
-        <h1 className="text-3xl font-bold">游戏不存在</h1>
-        <p className="text-muted-foreground">您访问的游戏不存在或已被删除</p>
-      </div>
-    );
-  }
-
-  // 从GAME_DETAILS获取当前游戏的详细信息
-  // 将游戏ID转换为字符串类型，确保与GAME_DETAILS的键类型匹配
-  const gameIdStr = game.id.toString();
-  const gameDetails = GAME_DETAILS[gameIdStr];
+  // 从 API 获取游戏基础信息和详情数据
+  const { data: game, isLoading: gameLoading, error: gameError } = useGameById(gameId);
+  const { data: gameDetails, isLoading: detailsLoading, error: detailsError } = useGameDetails(gameId);
 
   // 图片查看器状态
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
@@ -48,6 +33,39 @@ const GameDetail = () => {
     setIsImageViewerOpen(false);
   };
 
+  // 加载状态
+  if (gameLoading || detailsLoading) {
+    return (
+      <div className="w-full flex items-center justify-center min-h-[400px]">
+        <div className="text-center text-muted-foreground">加载中...</div>
+      </div>
+    );
+  }
+
+  // 错误状态
+  if (gameError || detailsError) {
+    return (
+      <div className="w-full flex items-center justify-center min-h-[400px]">
+        <div className="text-center text-destructive">加载数据失败，请稍后重试</div>
+      </div>
+    );
+  }
+
+  // 如果游戏不存在，显示错误信息
+  if (!game) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center gap-8 py-16">
+        <AlertCircle size={64} className="text-destructive" />
+        <h1 className="text-3xl font-bold">游戏不存在</h1>
+        <p className="text-muted-foreground">您访问的游戏不存在或已被删除</p>
+      </div>
+    );
+  }
+
+
+  // 拼接游戏封面图片 URL
+  const gameImageUrl = `${BASE_URL}${game.image}`;
+
   return (
     <div className="w-full flex flex-col gap-8 pb-16">
 
@@ -59,10 +77,10 @@ const GameDetail = () => {
           <div className="w-full md:w-[400px] lg:w-[500px] flex-shrink-0">
             <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-custom relative cursor-pointer hover:opacity-95 transition-opacity">
               <img
-                src={game.image}
+                src={gameImageUrl}
                 alt={game.title}
                 className="w-full h-full object-cover"
-                onClick={() => openImageViewer(game.image, game.title)}
+                onClick={() => openImageViewer(gameImageUrl, game.title)}
               />
               {game.isHot && (
                 <div className="absolute top-4 left-4 bg-destructive text-white px-4 py-1.5 rounded-full text-sm font-bold flex items-center gap-1 shadow-md">
@@ -109,11 +127,6 @@ const GameDetail = () => {
                 <span className="font-bold text-foreground">新手/熟人</span>
               </div>
             </div>
-
-            {/* <button className="btn-bounce bg-primary text-primary-foreground w-full sm:w-fit px-8 py-4 rounded-full font-bold text-lg shadow-custom hover:bg-primary/90 flex items-center justify-center gap-2">
-              <BookmarkPlus size={20} />
-              收藏这篇攻略
-            </button> */}
           </div>
         </div>
       </div>
@@ -152,10 +165,10 @@ const GameDetail = () => {
                         <span>{condition.text}</span>
                         {condition.image && (
                           <img
-                            src={condition.image}
+                            src={`${BASE_URL}${condition.image}`}
                             alt={`获胜条件${idx + 1}`}
                             className="rounded-lg w-full max-w-md mx-auto my-2 cursor-pointer hover:opacity-95 transition-opacity"
-                            onClick={() => openImageViewer(condition.image, `获胜条件${idx + 1}`)}
+                            onClick={() => openImageViewer(`${BASE_URL}${condition.image}`, `获胜条件${idx + 1}`)}
                           />
                         )}
                       </li>
@@ -181,7 +194,7 @@ const GameDetail = () => {
                           <div className="flex-1">
                             <h3 className="font-bold text-lg mb-1">{step.title}</h3>
                             <p className="text-muted-foreground">{
-                              Array.isArray(step.desc) ? step.desc.map(item => <div className='mb-4'>{item}</div>) : step.desc
+                              Array.isArray(step.desc) ? step.desc.map((item, i) => <div key={i} className='mb-4'>{item}</div>) : step.desc
                             }</p>
                           </div>
                         </div>
@@ -189,11 +202,11 @@ const GameDetail = () => {
                       {step.image && (
                         <div className="p-0.5 pt-0 cursor-pointer hover:opacity-95 transition-opacity">
                           <img
-                            src={step.image}
+                            src={`${BASE_URL}${step.image}`}
                             alt={`${step.title}`}
                             className="rounded-b-2xl w-full object-cover"
                             style={{ height: 'auto', maxHeight: '300px' }}
-                            onClick={() => openImageViewer(step.image, step.title)}
+                            onClick={() => openImageViewer(`${BASE_URL}${step.image}`, step.title)}
                           />
                         </div>
                       )}

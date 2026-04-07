@@ -2,11 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Gamepad2, Brain, Tent, Baby, BookOpen, ChevronRight } from 'lucide-react';
 import GameCard from '../components/GameCard';
-import { CATEGORIES_QUICK_LINKS, TRENDING_GAMES } from '@/constant';
+import { useTrendingGames, useQuickLinks } from '@/hooks/useGameData';
+import { BASE_URL } from '@/api/client';
 
 const Home = () => {
-  // 使用从data文件导入的静态数据
-  const categories = CATEGORIES_QUICK_LINKS.map(cat => ({
+  // 从 API 获取热门游戏和分类快速链接数据
+  const { data: trendingGames, isLoading: trendingLoading, error: trendingError } = useTrendingGames();
+  const { data: quickLinks, isLoading: linksLoading, error: linksError } = useQuickLinks();
+
+  // 将图标字符串映射为 React 组件
+  const categories = (quickLinks ?? []).map(cat => ({
     ...cat,
     icon: cat.icon === 'Tent' ? <Tent size={32} /> :
           cat.icon === 'Brain' ? <Brain size={32} /> :
@@ -14,9 +19,6 @@ const Home = () => {
           cat.icon === 'Baby' ? <Baby size={32} /> :
           <Gamepad2 size={32} />
   }));
-
-  // 使用统一管理的热门游戏数据
-  const trendingGames = TRENDING_GAMES;
 
   return (
     <div className="w-full flex flex-col gap-16 pb-16">
@@ -61,20 +63,26 @@ const Home = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-foreground">找点乐子</h2>
         </div>
         
-        <div className="flex overflow-x-auto no-scrollbar gap-4 md:grid md:grid-cols-5 md:gap-6 pb-4">
-          {categories.map((cat, idx) => (
-            <Link 
-              key={idx} 
-              to={cat.link}
-              className="group flex-shrink-0 w-[120px] md:w-auto flex flex-col items-center gap-3 p-6 rounded-3xl bg-card border border-border shadow-sm hover:shadow-custom hover:-translate-y-2 transition-all duration-300"
-            >
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${cat.color} group-hover:scale-110 transition-transform`}>
-                {cat.icon}
-              </div>
-              <span className="font-bold text-foreground">{cat.name}</span>
-            </Link>
-          ))}
-        </div>
+        {linksLoading ? (
+          <div className="text-center text-muted-foreground py-8">加载中...</div>
+        ) : linksError ? (
+          <div className="text-center text-destructive py-8">加载分类数据失败，请稍后重试</div>
+        ) : (
+          <div className="flex overflow-x-auto no-scrollbar gap-4 md:grid md:grid-cols-5 md:gap-6 pb-4">
+            {categories.map((cat, idx) => (
+              <Link 
+                key={idx} 
+                to={cat.link}
+                className="group flex-shrink-0 w-[120px] md:w-auto flex flex-col items-center gap-3 p-6 rounded-3xl bg-card border border-border shadow-sm hover:shadow-custom hover:-translate-y-2 transition-all duration-300"
+              >
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${cat.color} group-hover:scale-110 transition-transform`}>
+                  {cat.icon}
+                </div>
+                <span className="font-bold text-foreground">{cat.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Trending Games */}
@@ -89,11 +97,17 @@ const Home = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendingGames.map((game, idx) => (
-            <GameCard key={idx} {...game} />
-          ))}
-        </div>
+        {trendingLoading ? (
+          <div className="text-center text-muted-foreground py-8">加载中...</div>
+        ) : trendingError ? (
+          <div className="text-center text-destructive py-8">加载热门游戏失败，请稍后重试</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(trendingGames ?? []).map((game, idx) => (
+              <GameCard key={idx} {...game} image={`${BASE_URL}${game.image}`} />
+            ))}
+          </div>
+        )}
         
         <div className="mt-8 flex justify-center md:hidden">
           <Link to="/trending" className="btn-bounce w-full max-w-[300px] text-center bg-accent text-accent-foreground py-3 rounded-full font-bold border border-primary/20">
