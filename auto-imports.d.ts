@@ -32,22 +32,30 @@ declare global {
   const Contact: typeof import('lucide-react').Contact
   const Container: typeof import('lucide-react').Container
   const Dices: typeof import('lucide-react').Dices
+  const File: typeof import('lucide-react').File
+  const FileText: typeof import('lucide-react').FileText
   const Filter: typeof import('lucide-react').Filter
   const Flame: typeof import('lucide-react').Flame
   const Form: typeof import('lucide-react').Form
   const Fragment: typeof import('react').Fragment
   const Gamepad2: typeof import('lucide-react').Gamepad2
   const Grid: typeof import('lucide-react').Grid
+  const GripVertical: typeof import('lucide-react').GripVertical
   const GripVerticalIcon: typeof import('lucide-react').GripVerticalIcon
   const Heart: typeof import('lucide-react').Heart
   const HelpCircle: typeof import('lucide-react').HelpCircle
   const Home: typeof import('lucide-react').Home
+  const Icon: typeof import('lucide-react').Icon
   const Image: typeof import('lucide-react').Image
   const Infinity: typeof import('lucide-react').Infinity
   const Info: typeof import('lucide-react').Info
   const InfoIcon: typeof import('lucide-react').InfoIcon
   const Layout: typeof import('lucide-react').Layout
+  const LayoutDashboard: typeof import('lucide-react').LayoutDashboard
   const Link: typeof import('lucide-react').Link
+  const Link2: typeof import('lucide-react').Link2
+  const ListFilter: typeof import('lucide-react').ListFilter
+  const Loader2: typeof import('lucide-react').Loader2
   const Loader2Icon: typeof import('lucide-react').Loader2Icon
   const Mail: typeof import('lucide-react').Mail
   const Menu: typeof import('lucide-react').Menu
@@ -59,7 +67,9 @@ declare global {
   const Navigation: typeof import('lucide-react').Navigation
   const OctagonXIcon: typeof import('lucide-react').OctagonXIcon
   const PanelLeftIcon: typeof import('lucide-react').PanelLeftIcon
+  const Pencil: typeof import('lucide-react').Pencil
   const PlaySquare: typeof import('lucide-react').PlaySquare
+  const Plus: typeof import('lucide-react').Plus
   const Route: typeof import('lucide-react').Route
   const Search: typeof import('lucide-react').Search
   const SearchIcon: typeof import('lucide-react').SearchIcon
@@ -72,9 +82,11 @@ declare global {
   const Table: typeof import('lucide-react').Table
   const Target: typeof import('lucide-react').Target
   const Tent: typeof import('lucide-react').Tent
+  const Trash2: typeof import('lucide-react').Trash2
   const TriangleAlertIcon: typeof import('lucide-react').TriangleAlertIcon
   const Trophy: typeof import('lucide-react').Trophy
   const Type: typeof import('lucide-react').Type
+  const Upload: typeof import('lucide-react').Upload
   const User: typeof import('lucide-react').User
   const Users: typeof import('lucide-react').Users
   const X: typeof import('lucide-react').X

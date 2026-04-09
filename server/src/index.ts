@@ -9,6 +9,11 @@ import { getDb } from './db.js';
 import gamesRouter from './routes/games.js';
 import categoriesRouter from './routes/categories.js';
 import guideRouter from './routes/guide.js';
+import adminGamesRouter from './routes/admin/games.js';
+import adminCategoriesRouter from './routes/admin/categories.js';
+import adminGuideRouter from './routes/admin/guide.js';
+import adminUploadRouter from './routes/admin/upload.js';
+import adminStatsRouter from './routes/admin/stats.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,10 +36,17 @@ app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images')
 // 可配置端口，默认 3001，支持环境变量 PORT 覆盖
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 
-// 注册 API 路由
+// 注册只读 API 路由
 app.use('/api/games', gamesRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/guide', guideRouter);
+
+// 注册管理 API 路由
+app.use('/api/admin/games', adminGamesRouter);
+app.use('/api/admin/categories', adminCategoriesRouter);
+app.use('/api/admin/guide', adminGuideRouter);
+app.use('/api/admin/upload', adminUploadRouter);
+app.use('/api/admin', adminStatsRouter);
 
 // 注册错误处理中间件（必须在路由之后）
 app.use(notFoundHandler);

@@ -51,6 +51,7 @@ export interface CategoryOptions {
 
 /** 分类快速链接 */
 export interface QuickLink {
+  id?: number;
   name: string;
   icon: string;
   color: string;
@@ -59,14 +60,18 @@ export interface QuickLink {
 
 /** 新手常见问题 */
 export interface FAQ {
+  id?: number;
   q: string;
   a: string;
+  sort_order?: number;
 }
 
 /** 新手指南步骤 */
 export interface GuideStep {
+  id?: number;
   step: string;
   desc: string;
+  sort_order?: number;
 }
 
 // ============ API 客户端配置 ============

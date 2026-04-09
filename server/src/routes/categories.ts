@@ -37,7 +37,7 @@ router.get('/options', (_req: Request, res: Response) => {
 // GET /api/categories/quick-links - 获取分类快速链接列表
 router.get('/quick-links', (_req: Request, res: Response) => {
   const db = getDb();
-  const rows = db.prepare('SELECT name, icon, color, link FROM quick_links').all() as QuickLink[];
+  const rows = db.prepare('SELECT id, name, icon, color, link FROM quick_links').all() as QuickLink[];
 
   res.json({ data: rows });
 });
