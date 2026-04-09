@@ -12,10 +12,14 @@ declare global {
   const ArrowRight: typeof import('lucide-react').ArrowRight
   const Baby: typeof import('lucide-react').Baby
   const Badge: typeof import('lucide-react').Badge
+  const Ban: typeof import('lucide-react').Ban
+  const Bold: typeof import('lucide-react').Bold
   const BookOpen: typeof import('lucide-react').BookOpen
   const BookmarkPlus: typeof import('lucide-react').BookmarkPlus
+  const Bot: typeof import('lucide-react').Bot
   const Brain: typeof import('lucide-react').Brain
   const Calendar: typeof import('lucide-react').Calendar
+  const Check: typeof import('lucide-react').Check
   const CheckCircle2: typeof import('lucide-react').CheckCircle2
   const CheckIcon: typeof import('lucide-react').CheckIcon
   const ChevronDown: typeof import('lucide-react').ChevronDown
@@ -31,6 +35,8 @@ declare global {
   const Component: typeof import('lucide-react').Component
   const Contact: typeof import('lucide-react').Contact
   const Container: typeof import('lucide-react').Container
+  const Copy: typeof import('lucide-react').Copy
+  const Crown: typeof import('lucide-react').Crown
   const Dices: typeof import('lucide-react').Dices
   const File: typeof import('lucide-react').File
   const FileText: typeof import('lucide-react').FileText
@@ -42,6 +48,8 @@ declare global {
   const Grid: typeof import('lucide-react').Grid
   const GripVertical: typeof import('lucide-react').GripVertical
   const GripVerticalIcon: typeof import('lucide-react').GripVerticalIcon
+  const Heading2: typeof import('lucide-react').Heading2
+  const Heading3: typeof import('lucide-react').Heading3
   const Heart: typeof import('lucide-react').Heart
   const HelpCircle: typeof import('lucide-react').HelpCircle
   const Home: typeof import('lucide-react').Home
@@ -50,13 +58,18 @@ declare global {
   const Infinity: typeof import('lucide-react').Infinity
   const Info: typeof import('lucide-react').Info
   const InfoIcon: typeof import('lucide-react').InfoIcon
+  const Italic: typeof import('lucide-react').Italic
   const Layout: typeof import('lucide-react').Layout
   const LayoutDashboard: typeof import('lucide-react').LayoutDashboard
   const Link: typeof import('lucide-react').Link
   const Link2: typeof import('lucide-react').Link2
+  const LinkIcon: typeof import('lucide-react').LinkIcon
+  const List: typeof import('lucide-react').List
   const ListFilter: typeof import('lucide-react').ListFilter
+  const ListOrdered: typeof import('lucide-react').ListOrdered
   const Loader2: typeof import('lucide-react').Loader2
   const Loader2Icon: typeof import('lucide-react').Loader2Icon
+  const LogOut: typeof import('lucide-react').LogOut
   const Mail: typeof import('lucide-react').Mail
   const Menu: typeof import('lucide-react').Menu
   const MessageCircle: typeof import('lucide-react').MessageCircle
@@ -66,15 +79,22 @@ declare global {
   const MoreHorizontalIcon: typeof import('lucide-react').MoreHorizontalIcon
   const Navigation: typeof import('lucide-react').Navigation
   const OctagonXIcon: typeof import('lucide-react').OctagonXIcon
+  const Palette: typeof import('lucide-react').Palette
   const PanelLeftIcon: typeof import('lucide-react').PanelLeftIcon
   const Pencil: typeof import('lucide-react').Pencil
   const PlaySquare: typeof import('lucide-react').PlaySquare
   const Plus: typeof import('lucide-react').Plus
+  const Quote: typeof import('lucide-react').Quote
+  const RefreshCw: typeof import('lucide-react').RefreshCw
+  const RotateCcw: typeof import('lucide-react').RotateCcw
+  const RotateCw: typeof import('lucide-react').RotateCw
   const Route: typeof import('lucide-react').Route
   const Search: typeof import('lucide-react').Search
   const SearchIcon: typeof import('lucide-react').SearchIcon
   const Section: typeof import('lucide-react').Section
   const Sheet: typeof import('lucide-react').Sheet
+  const ShieldCheck: typeof import('lucide-react').ShieldCheck
+  const ShieldQuestion: typeof import('lucide-react').ShieldQuestion
   const Sidebar: typeof import('lucide-react').Sidebar
   const Sparkles: typeof import('lucide-react').Sparkles
   const Star: typeof import('lucide-react').Star
@@ -88,7 +108,10 @@ declare global {
   const Type: typeof import('lucide-react').Type
   const Upload: typeof import('lucide-react').Upload
   const User: typeof import('lucide-react').User
+  const UserRound: typeof import('lucide-react').UserRound
   const Users: typeof import('lucide-react').Users
+  const Wifi: typeof import('lucide-react').Wifi
+  const WifiOff: typeof import('lucide-react').WifiOff
   const X: typeof import('lucide-react').X
   const XIcon: typeof import('lucide-react').XIcon
   const cache: typeof import('react').cache

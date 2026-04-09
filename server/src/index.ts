@@ -1,7 +1,8 @@
 // Express 服务入口文件
-// 配置 Express 应用、CORS、静态文件服务，启动时连接数据库
+// 配置 Express 应用、CORS、静态文件服务，集成 Socket.io，启动时连接数据库
 
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -15,11 +16,18 @@ import adminGuideRouter from './routes/admin/guide.js';
 import adminUploadRouter from './routes/admin/upload.js';
 import adminStatsRouter from './routes/admin/stats.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+import { initSocketServer } from './uno/socket.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// 将 Express app 包装为 HTTP server，以便集成 Socket.io
+const httpServer = createServer(app);
+
+// 初始化 Socket.io
+initSocketServer(httpServer);
 
 // 启用 JSON 请求体解析
 app.use(express.json());
@@ -57,7 +65,8 @@ function start(): void {
   // 启动时连接数据库（getDb 内部会处理连接失败并 process.exit(1)）
   getDb();
 
-  app.listen(PORT, () => {
+  // 使用 httpServer.listen 替代 app.listen，以支持 Socket.io WebSocket 连接
+  httpServer.listen(PORT, () => {
     console.log(`服务已启动，监听端口 ${PORT}`);
   });
 }

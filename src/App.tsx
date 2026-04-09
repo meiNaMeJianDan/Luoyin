@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Toaster } from "sonner";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -16,6 +16,11 @@ import CategoryOptions from "./pages/admin/CategoryOptions";
 import QuickLinks from "./pages/admin/QuickLinks";
 import FAQsManage from "./pages/admin/FAQsManage";
 import GuideSteps from "./pages/admin/GuideSteps";
+import { GameProvider } from "./pages/uno/context/GameContext";
+import UnoHome from "./pages/uno/index";
+import UnoRoom from "./pages/uno/Room";
+import UnoGame from "./pages/uno/Game";
+import UnoResult from "./pages/uno/Result";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +78,14 @@ const App = () => (
             </Layout>
           }
         />
+
+        {/* UNO 游戏路由 — 共享一个 GameProvider，避免页面切换时重建 Socket 连接 */}
+        <Route element={<GameProvider><Outlet /></GameProvider>}>
+          <Route path="/uno" element={<UnoHome />} />
+          <Route path="/uno/room/:roomId" element={<UnoRoom />} />
+          <Route path="/uno/game/:roomId" element={<UnoGame />} />
+          <Route path="/uno/result/:roomId" element={<UnoResult />} />
+        </Route>
 
         {/* 管理后台路由 — 使用 AdminLayout，独立于前台 */}
         <Route path="/admin" element={<AdminLayout />}>

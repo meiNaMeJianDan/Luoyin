@@ -132,7 +132,7 @@ const GameDetail = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="mx-auto w-full px-4 ">
 
         {/* Left Column: Rules & Guide */}
         <div className="lg:col-span-2 flex flex-col gap-10">
@@ -147,7 +147,8 @@ const GameDetail = () => {
                   游戏简介
                 </h2>
                 <div className="bg-card rounded-3xl p-6 md:p-8 border border-border shadow-sm text-lg text-foreground leading-relaxed">
-                  <p>{gameDetails.introduction}</p>
+                  {/* 使用 dangerouslySetInnerHTML 渲染富文本 HTML 内容，兼容纯文本 */}
+                  <div dangerouslySetInnerHTML={{ __html: gameDetails.introduction }} />
                 </div>
               </section>
 
@@ -158,11 +159,13 @@ const GameDetail = () => {
                   游戏玩法
                 </h2>
                 <div className="bg-card rounded-3xl p-6 md:p-8 border border-border shadow-sm text-lg text-foreground leading-relaxed">
-                  <p className="mb-4">{gameDetails.objective}</p>
+                  {/* 使用 dangerouslySetInnerHTML 渲染富文本 HTML 内容，兼容纯文本 */}
+                  <div className="mb-4" dangerouslySetInnerHTML={{ __html: gameDetails.objective }} />
                   <ul className="list-disc list-inside space-y-4 ml-4">
                     {gameDetails.victoryConditions.map((condition, idx) => (
                       <li key={idx} className="flex flex-col gap-2">
-                        <span>{condition.text}</span>
+                        {/* 使用 dangerouslySetInnerHTML 渲染富文本 HTML 内容，兼容纯文本 */}
+                        <span dangerouslySetInnerHTML={{ __html: condition.text || '' }} />
                         {condition.image && (
                           <img
                             src={`${BASE_URL}${condition.image}`}
@@ -193,9 +196,8 @@ const GameDetail = () => {
                           </div>
                           <div className="flex-1">
                             <h3 className="font-bold text-lg mb-1">{step.title}</h3>
-                            <p className="text-muted-foreground">{
-                              Array.isArray(step.desc) ? step.desc.map((item, i) => <div key={i} className='mb-4'>{item}</div>) : step.desc
-                            }</p>
+                            {/* 使用 dangerouslySetInnerHTML 渲染富文本 HTML 内容，兼容纯文本和数组格式 */}
+                            <div className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: Array.isArray(step.desc) ? step.desc.join('') : step.desc }} />
                           </div>
                         </div>
                       </div>

@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -15,8 +15,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -128,10 +128,8 @@ const GameDetailManage = () => {
       })),
       gameplaySteps: values.gameplaySteps.map((gs) => ({
         title: gs.title,
-        // 如果 desc 包含换行，转为数组
-        desc: gs.desc.includes('\n')
-          ? gs.desc.split('\n').filter((line) => line.trim() !== '')
-          : gs.desc,
+        // HTML 内容直接作为字符串提交
+        desc: gs.desc,
         image: gs.image || null,
       })),
       tips: values.tips.map((t) => t.value),
@@ -261,24 +259,26 @@ const GameDetailManage = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-1.5">
-                <Label htmlFor="introduction">游戏简介 *</Label>
-                <Textarea
-                  id="introduction"
-                  {...form.register('introduction')}
-                  placeholder="输入游戏简介"
-                  rows={3}
+                <Label>游戏简介 *</Label>
+                <Controller
+                  name="introduction"
+                  control={form.control}
+                  render={({ field }) => (
+                    <RichTextEditor value={field.value} onChange={field.onChange} placeholder="输入游戏简介" />
+                  )}
                 />
                 {form.formState.errors.introduction && (
                   <p className="text-sm text-destructive">{form.formState.errors.introduction.message}</p>
                 )}
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="objective">游戏目标 *</Label>
-                <Textarea
-                  id="objective"
-                  {...form.register('objective')}
-                  placeholder="输入游戏目标"
-                  rows={2}
+                <Label>游戏目标 *</Label>
+                <Controller
+                  name="objective"
+                  control={form.control}
+                  render={({ field }) => (
+                    <RichTextEditor value={field.value} onChange={field.onChange} placeholder="输入游戏目标" />
+                  )}
                 />
                 {form.formState.errors.objective && (
                   <p className="text-sm text-destructive">{form.formState.errors.objective.message}</p>
@@ -310,9 +310,12 @@ const GameDetailManage = () => {
                   <div className="flex-1 space-y-2">
                     <div className="grid gap-1">
                       <Label>条件描述</Label>
-                      <Input
-                        {...form.register(`victoryConditions.${index}.text`)}
-                        placeholder="获胜条件描述"
+                      <Controller
+                        name={`victoryConditions.${index}.text`}
+                        control={form.control}
+                        render={({ field }) => (
+                          <RichTextEditor value={field.value} onChange={field.onChange} placeholder="获胜条件描述" />
+                        )}
                       />
                     </div>
                     <div className="grid gap-1">
@@ -372,11 +375,13 @@ const GameDetailManage = () => {
                       )}
                     </div>
                     <div className="grid gap-1">
-                      <Label>步骤描述 *（换行将转为多段）</Label>
-                      <Textarea
-                        {...form.register(`gameplaySteps.${index}.desc`)}
-                        placeholder="步骤描述，支持多行"
-                        rows={3}
+                      <Label>步骤描述 *</Label>
+                      <Controller
+                        name={`gameplaySteps.${index}.desc`}
+                        control={form.control}
+                        render={({ field }) => (
+                          <RichTextEditor value={field.value} onChange={field.onChange} placeholder="步骤描述" />
+                        )}
                       />
                       {form.formState.errors.gameplaySteps?.[index]?.desc && (
                         <p className="text-sm text-destructive">
