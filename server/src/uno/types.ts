@@ -103,6 +103,8 @@ export interface Room {
   gameState: GameState | null;
   /** 创建时间戳 */
   createdAt: number;
+  /** 是否允许 AI 托管（掉线时自动 AI 代打） */
+  allowAI: boolean;
 }
 
 /** 质疑结果 */

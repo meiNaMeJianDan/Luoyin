@@ -9,11 +9,11 @@
 // 超时常量（毫秒）
 // ============================================================
 
-/** 回合操作超时：30 秒 */
-export const TURN_TIMEOUT = 30 * 1000;
+/** 回合操作超时：60 秒 */
+export const TURN_TIMEOUT = 60 * 1000;
 
 /** 颜色选择超时：15 秒 */
-export const COLOR_CHOOSE_TIMEOUT = 15 * 1000;
+export const COLOR_CHOOSE_TIMEOUT = 30 * 1000;
 
 /** 质疑决策超时：10 秒 */
 export const CHALLENGE_TIMEOUT = 10 * 1000;

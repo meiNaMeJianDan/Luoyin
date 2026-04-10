@@ -33,8 +33,10 @@ initSocketServer(httpServer);
 app.use(express.json());
 
 // 配置 CORS，允许前端开发服务器访问
+// 通过环境变量 CORS_ORIGIN 控制，默认允许所有来源（开发环境）
+const corsOrigin = process.env.CORS_ORIGIN || '*';
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: corsOrigin,
 }));
 
 // 配置静态文件服务，提供游戏图片资源

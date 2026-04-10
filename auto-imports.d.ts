@@ -74,6 +74,7 @@ declare global {
   const Menu: typeof import('lucide-react').Menu
   const MessageCircle: typeof import('lucide-react').MessageCircle
   const MessageSquare: typeof import('lucide-react').MessageSquare
+  const Minus: typeof import('lucide-react').Minus
   const MinusIcon: typeof import('lucide-react').MinusIcon
   const MoreHorizontal: typeof import('lucide-react').MoreHorizontal
   const MoreHorizontalIcon: typeof import('lucide-react').MoreHorizontalIcon

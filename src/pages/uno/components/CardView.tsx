@@ -101,9 +101,9 @@ export default function CardView({
         colorMap[card.color],
         colorTextMap[card.color],
         'border-2 flex flex-col items-center justify-center shadow-md',
-        'font-bold select-none transition-all duration-200',
-        playable && 'cursor-pointer hover:-translate-y-2 hover:shadow-xl ring-2 ring-white/50',
-        !playable && onClick === undefined && 'opacity-50',
+        'font-bold select-none transition-all duration-300 ease-out',
+        playable && 'cursor-pointer ring-2 ring-white/60 shadow-lg scale-105',
+        !playable && onClick === undefined && 'opacity-40 saturate-50',
         onClick && !playable && 'cursor-pointer hover:opacity-70',
         className,
       )}

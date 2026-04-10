@@ -20,6 +20,9 @@ import {
   handleReconnect,
   findPlayerBySocketId,
   setRoomStatus,
+  toggleAllowAI,
+  addAIPlayer,
+  removeAIPlayer,
 } from './room.js';
 import {
   initGame,
@@ -69,6 +72,7 @@ function broadcastRoomUpdate(io: SocketIOServer, room: Room): void {
     })),
     status: room.status,
     hostId: room.hostId,
+    allowAI: room.allowAI,
   };
 
   for (const player of room.players) {
@@ -118,11 +122,14 @@ function startTurnTimer(io: SocketIOServer, roomId: string): void {
 
   const currentPlayer = room.gameState.players[room.gameState.currentPlayerIndex];
 
-  // 如果当前玩家是 AI 或已掉线，启动 AI 计时器
-  if (currentPlayer.isAI || !currentPlayer.isConnected) {
+  // 只有人机（isAI=true）才启动 AI 计时器，掉线玩家走正常超时
+  if (currentPlayer.isAI) {
+    console.log(`[Timer] 当前玩家 ${currentPlayer.name} 是 AI，启动 AI 计时器`);
     startAiTimer(io, roomId);
     return;
   }
+
+  console.log(`[Timer] 当前玩家 ${currentPlayer.name} 是真人，启动 30 秒超时`);
 
   // 启动回合超时计时器（30 秒）
   startTimer(roomId, 'turn', () => {
@@ -152,6 +159,7 @@ function startTurnTimer(io: SocketIOServer, roomId: string): void {
  */
 function startAiTimer(io: SocketIOServer, roomId: string): void {
   clearTimer(roomId, 'ai');
+  console.log(`[AI] 启动 AI 计时器，房间 ${roomId}`);
 
   startTimer(roomId, 'ai', () => {
     const room = getRoom(roomId);
@@ -159,6 +167,7 @@ function startAiTimer(io: SocketIOServer, roomId: string): void {
 
     const currentPlayer = room.gameState.players[room.gameState.currentPlayerIndex];
     if (!currentPlayer) return;
+    console.log(`[AI] AI 玩家 ${currentPlayer.name} 开始决策`);
 
     const gs = room.gameState;
     const topCard = gs.discardPile[gs.discardPile.length - 1];
@@ -323,7 +332,7 @@ function startAiTimer(io: SocketIOServer, roomId: string): void {
 export function initSocketServer(httpServer: HttpServer): SocketIOServer {
   const io = new SocketIOServer(httpServer, {
     cors: {
-      origin: 'http://localhost:5173',
+      origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],
     },
   });
@@ -464,6 +473,98 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
       } catch (err) {
         console.error('[Socket] player_ready 错误:', err);
         socket.emit('error', { message: '准备操作失败' });
+      }
+    });
+
+    // ========================================================
+    // toggle_ai — 切换 AI 托管开关（仅房主可操作）
+    // ========================================================
+    socket.on('toggle_ai', (data: unknown) => {
+      try {
+        const { roomId } = (data ?? {}) as { roomId?: string };
+        const roomIdErr = validateRoomId(roomId);
+        if (roomIdErr) {
+          socket.emit('error', { message: roomIdErr });
+          return;
+        }
+
+        const mapping = findPlayerBySocketId(socket.id);
+        if (!mapping) {
+          socket.emit('error', { message: '你不在该房间中' });
+          return;
+        }
+
+        const room = getRoom(roomId!);
+        if (!room) {
+          socket.emit('error', { message: '房间不存在' });
+          return;
+        }
+
+        // 只有房主可以切换 AI 开关
+        if (room.hostId !== mapping.playerId) {
+          socket.emit('error', { message: '只有房主可以切换 AI 设置' });
+          return;
+        }
+
+        const updatedRoom = toggleAllowAI(roomId!);
+        if (updatedRoom) {
+          broadcastRoomUpdate(io, updatedRoom);
+        }
+      } catch (err) {
+        console.error('[Socket] toggle_ai 错误:', err);
+        socket.emit('error', { message: '切换 AI 设置失败' });
+      }
+    });
+
+    // ========================================================
+    // add_ai — 添加人机玩家（仅房主可操作）
+    // ========================================================
+    socket.on('add_ai', (data: unknown) => {
+      try {
+        const { roomId } = (data ?? {}) as { roomId?: string };
+        const roomIdErr = validateRoomId(roomId);
+        if (roomIdErr) { socket.emit('error', { message: roomIdErr }); return; }
+
+        const mapping = findPlayerBySocketId(socket.id);
+        if (!mapping) { socket.emit('error', { message: '你不在该房间中' }); return; }
+
+        const room = getRoom(roomId!);
+        if (!room) { socket.emit('error', { message: '房间不存在' }); return; }
+        if (room.hostId !== mapping.playerId) { socket.emit('error', { message: '只有房主可以添加人机' }); return; }
+
+        const result = addAIPlayer(roomId!);
+        if ('error' in result) { socket.emit('error', { message: result.error }); return; }
+
+        broadcastRoomUpdate(io, result);
+      } catch (err) {
+        console.error('[Socket] add_ai 错误:', err);
+        socket.emit('error', { message: '添加人机失败' });
+      }
+    });
+
+    // ========================================================
+    // remove_ai — 移除人机玩家（仅房主可操作）
+    // ========================================================
+    socket.on('remove_ai', (data: unknown) => {
+      try {
+        const { roomId } = (data ?? {}) as { roomId?: string };
+        const roomIdErr = validateRoomId(roomId);
+        if (roomIdErr) { socket.emit('error', { message: roomIdErr }); return; }
+
+        const mapping = findPlayerBySocketId(socket.id);
+        if (!mapping) { socket.emit('error', { message: '你不在该房间中' }); return; }
+
+        const room = getRoom(roomId!);
+        if (!room) { socket.emit('error', { message: '房间不存在' }); return; }
+        if (room.hostId !== mapping.playerId) { socket.emit('error', { message: '只有房主可以移除人机' }); return; }
+
+        const result = removeAIPlayer(roomId!);
+        if ('error' in result) { socket.emit('error', { message: result.error }); return; }
+
+        broadcastRoomUpdate(io, result);
+      } catch (err) {
+        console.error('[Socket] remove_ai 错误:', err);
+        socket.emit('error', { message: '移除人机失败' });
       }
     });
 
@@ -1102,20 +1203,15 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
           }
         }
 
-        // 如果游戏进行中，标记为 AI 托管
+        // 如果游戏进行中，掉线玩家不再自动 AI 托管，等待超时自动摸牌
         if (room.gameState && room.gameState.phase !== 'finished') {
-          const player = room.gameState.players.find((p) => p.id === playerId);
-          if (player) {
-            player.isAI = true;
-          }
-
           broadcastGameState(io, room);
 
-          // 如果当前轮到掉线玩家，启动 AI 计时器
+          // 如果当前轮到掉线玩家，启动回合超时（超时后自动摸牌跳过）
           const currentPlayer = room.gameState.players[room.gameState.currentPlayerIndex];
           if (currentPlayer && currentPlayer.id === playerId) {
             clearTimer(roomId, 'turn');
-            startAiTimer(io, roomId);
+            startTurnTimer(io, roomId);
           }
         } else if (room.status === 'waiting') {
           // 房间等待中：30 秒后移除掉线玩家

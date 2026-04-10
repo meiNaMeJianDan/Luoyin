@@ -82,6 +82,7 @@ export interface RoomInfo {
   }[]
   status: RoomStatus
   hostId: string
+  allowAI: boolean
 }
 
 /** 质疑结果 */

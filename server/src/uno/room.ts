@@ -72,6 +72,7 @@ export function createRoom(playerName: string, socketId: string): { room: Room; 
     hostId: playerId,
     gameState: null,
     createdAt: Date.now(),
+    allowAI: true,
   };
 
   rooms.set(roomId, room);
@@ -101,7 +102,7 @@ export function joinRoom(
   if (room.status !== 'waiting') {
     return { error: '游戏已开始' };
   }
-  if (room.players.length >= 4) {
+  if (room.players.length >= 10) {
     return { error: '房间已满' };
   }
 
@@ -178,13 +179,14 @@ export function toggleReady(roomId: string, playerId: string): Room | null {
 
 /**
  * 检查是否可以开始游戏
- * - 所有玩家已准备
- * - 玩家人数 2～4
+ * - 所有非房主玩家已准备（房主不需要准备）
+ * - 玩家人数 2～10
  */
 export function canStartGame(room: Room): boolean {
   const playerCount = room.players.length;
-  if (playerCount < 2 || playerCount > 4) return false;
-  return room.players.every((p) => p.isReady);
+  if (playerCount < 2 || playerCount > 10) return false;
+  // 房主不需要准备，AI 自动准备，其他真人玩家必须全部准备
+  return room.players.every((p) => p.isHost || p.isAI || p.isReady);
 }
 
 /**
@@ -192,6 +194,66 @@ export function canStartGame(room: Room): boolean {
  */
 export function getRoom(roomId: string): Room | undefined {
   return rooms.get(roomId);
+}
+
+/**
+ * 切换房间的 AI 托管开关
+ */
+export function toggleAllowAI(roomId: string): Room | null {
+  const room = rooms.get(roomId);
+  if (!room) return null;
+  room.allowAI = !room.allowAI;
+  return room;
+}
+
+/** AI 名字池 */
+const AI_NAMES = ['小智', '小慧', '小明', '小红', '小蓝', '小绿', '小黄', '小紫', '小橙'];
+let aiNameIndex = 0;
+
+/**
+ * 添加 AI 玩家到房间
+ * - 仅在等待状态且未满员时可添加
+ * - AI 自动准备
+ */
+export function addAIPlayer(roomId: string): Room | { error: string } {
+  const room = rooms.get(roomId);
+  if (!room) return { error: '房间不存在' };
+  if (room.status !== 'waiting') return { error: '游戏已开始' };
+  if (room.players.length >= 10) return { error: '房间已满' };
+
+  const playerId = uuidv4();
+  const name = AI_NAMES[aiNameIndex % AI_NAMES.length] + (aiNameIndex > 8 ? `${Math.floor(aiNameIndex / 9) + 1}` : '');
+  aiNameIndex++;
+
+  const aiPlayer: Player = {
+    id: playerId,
+    name: `🤖 ${name}`,
+    socketId: '',
+    hand: [],
+    isReady: true,
+    isHost: false,
+    isAI: true,
+    isConnected: true,
+    calledUno: false,
+  };
+
+  room.players.push(aiPlayer);
+  return room;
+}
+
+/**
+ * 移除房间中的一个 AI 玩家
+ */
+export function removeAIPlayer(roomId: string): Room | { error: string } {
+  const room = rooms.get(roomId);
+  if (!room) return { error: '房间不存在' };
+  if (room.status !== 'waiting') return { error: '游戏已开始' };
+
+  const aiIndex = room.players.findIndex((p) => p.isAI);
+  if (aiIndex === -1) return { error: '没有 AI 玩家可移除' };
+
+  room.players.splice(aiIndex, 1);
+  return room;
 }
 
 // ============================================================

@@ -335,6 +335,27 @@ export function useGame() {
     emit('accept_wild4', { roomId })
   }, [emit, state.gameState?.roomId, state.room?.id])
 
+  const toggleAI = useCallback(
+    (roomId: string) => {
+      emit('toggle_ai', { roomId })
+    },
+    [emit],
+  )
+
+  const addAI = useCallback(
+    (roomId: string) => {
+      emit('add_ai', { roomId })
+    },
+    [emit],
+  )
+
+  const removeAI = useCallback(
+    (roomId: string) => {
+      emit('remove_ai', { roomId })
+    },
+    [emit],
+  )
+
   return {
     ...state,
     createRoom,
@@ -349,5 +370,8 @@ export function useGame() {
     chooseColor,
     challengeWild4,
     acceptWild4,
+    toggleAI,
+    addAI,
+    removeAI,
   }
 }
