@@ -21,6 +21,11 @@ import UnoHome from "./pages/uno/index";
 import UnoRoom from "./pages/uno/Room";
 import UnoGame from "./pages/uno/Game";
 import UnoResult from "./pages/uno/Result";
+import { CatanGameProvider } from "./pages/catan/context/CatanGameContext";
+import CatanHome from "./pages/catan/index";
+import CatanRoom from "./pages/catan/Room";
+import CatanGame from "./pages/catan/Game";
+import CatanResult from "./pages/catan/Result";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +90,14 @@ const App = () => (
           <Route path="/uno/room/:roomId" element={<UnoRoom />} />
           <Route path="/uno/game/:roomId" element={<UnoGame />} />
           <Route path="/uno/result/:roomId" element={<UnoResult />} />
+        </Route>
+
+        {/* 卡坦岛游戏路由 — 共享一个 CatanGameProvider，避免页面切换时重建 Socket 连接 */}
+        <Route element={<CatanGameProvider />}>
+          <Route path="/catan" element={<CatanHome />} />
+          <Route path="/catan/room/:roomId" element={<CatanRoom />} />
+          <Route path="/catan/game/:roomId" element={<CatanGame />} />
+          <Route path="/catan/result/:roomId" element={<CatanResult />} />
         </Route>
 
         {/* 管理后台路由 — 使用 AdminLayout，独立于前台 */}

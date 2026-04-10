@@ -17,6 +17,7 @@ import adminUploadRouter from './routes/admin/upload.js';
 import adminStatsRouter from './routes/admin/stats.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 import { initSocketServer } from './uno/socket.js';
+import { initCatanSocketServer } from './catan/socket.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,8 +27,11 @@ const app = express();
 // 将 Express app 包装为 HTTP server，以便集成 Socket.io
 const httpServer = createServer(app);
 
-// 初始化 Socket.io
+// 初始化 Socket.io（UNO）
 initSocketServer(httpServer);
+
+// 初始化卡坦岛 Socket.io 事件（与 UNO 共享 httpServer，通过事件前缀隔离）
+initCatanSocketServer(httpServer);
 
 // 启用 JSON 请求体解析
 app.use(express.json());
