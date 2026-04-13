@@ -29,11 +29,11 @@ const DEV_CARD_NAMES: Record<DevCardType, string> = {
 
 /** 资源中文名称映射 */
 const RESOURCE_NAMES: Record<ResourceType, string> = {
-  wood: '🪵 木材',
+  wood: '🌲 木材',
   brick: '🧱 黏土',
   sheep: '🐑 羊毛',
   wheat: '🌾 小麦',
-  ore: '⛏ 矿石',
+  ore: '⛰️ 矿石',
 }
 
 /** 检查资源是否足够 */

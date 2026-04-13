@@ -174,7 +174,7 @@ export default function CatanRoom() {
         {/* 操作按钮 */}
         <div className="space-y-2">
           {isHost ? (
-            <Button className="w-full h-11" disabled={!canStart} onClick={() => roomId && startGame(roomId)}>
+            <Button className="w-full h-11" disabled={!canStart} onClick={() => roomId && startGame(roomId, true)}>
               {canStart ? '开始游戏' : '等待所有玩家准备'}
             </Button>
           ) : (

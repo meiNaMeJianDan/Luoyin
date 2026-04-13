@@ -156,11 +156,11 @@ function vertexToPixel(vertexId: string, size: number): { x: number; y: number }
 /** 港口类型中文名和颜色 */
 const HARBOR_INFO: Record<string, { label: string; color: string }> = {
   generic: { label: '3:1', color: '#f5f5f5' },
-  wood: { label: '🪵2:1', color: '#2d6a2e' },
+  wood: { label: '🌲2:1', color: '#2d6a2e' },
   brick: { label: '🧱2:1', color: '#b5651d' },
   sheep: { label: '🐑2:1', color: '#7ec850' },
   wheat: { label: '🌾2:1', color: '#daa520' },
-  ore: { label: '⛏2:1', color: '#808080' },
+  ore: { label: '⛰️2:1', color: '#808080' },
 }
 
 interface HexMapProps {

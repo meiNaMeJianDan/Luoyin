@@ -125,7 +125,7 @@ export default function GameInfoPanel({ gameState, playerId, collapsed, onToggle
   const reversedLog = [...gameState.log].reverse()
 
   return (
-    <div className="h-full flex flex-col bg-black/40 backdrop-blur-sm rounded-xl p-3 space-y-3 overflow-hidden">
+    <div className="h-full flex flex-col bg-black/40 backdrop-blur-sm rounded-xl p-3 space-y-3 overflow-y-auto">
       {/* 游戏状态 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

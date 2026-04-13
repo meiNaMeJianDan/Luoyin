@@ -18,11 +18,11 @@ import type { ResourceMap, ResourceType, TradeRatios, TradeProposal, ClientCatan
 
 /** 资源信息 */
 const RESOURCES: { type: ResourceType; icon: string; name: string }[] = [
-  { type: 'wood', icon: '🪵', name: '木材' },
+  { type: 'wood', icon: '🌲', name: '木材' },
   { type: 'brick', icon: '🧱', name: '黏土' },
   { type: 'sheep', icon: '🐑', name: '羊毛' },
   { type: 'wheat', icon: '🌾', name: '小麦' },
-  { type: 'ore', icon: '⛏', name: '矿石' },
+  { type: 'ore', icon: '⛰️', name: '矿石' },
 ]
 
 const emptyResources = (): ResourceMap => ({
@@ -191,7 +191,7 @@ export default function TradeDialog({
               <Button size="sm" onClick={() => onAcceptTrade(currentTrade.id)} className="bg-green-600 hover:bg-green-500">
                 ✅ 接受
               </Button>
-              <Button size="sm" variant="outline" onClick={() => onRejectTrade(currentTrade.id)} className="border-white/20 text-white">
+              <Button size="sm" variant="outline" onClick={() => onRejectTrade(currentTrade.id)} className="border-white/20 text-primary">
                 ❌ 拒绝
               </Button>
             </div>

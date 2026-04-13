@@ -936,7 +936,15 @@ export function initCatanSocketServer(httpServer: HttpServer): void {
           return;
         }
 
-        addLog(room, mapping.playerId, 'discard', '丢弃了资源');
+        // 生成丢弃资源的详细描述
+        const discardDetails = (['wood', 'brick', 'sheep', 'wheat', 'ore'] as const)
+          .filter(r => resources![r] > 0)
+          .map(r => {
+            const names: Record<string, string> = { wood: '木材', brick: '黏土', sheep: '羊毛', wheat: '小麦', ore: '矿石' };
+            return `${names[r]}×${resources![r]}`;
+          })
+          .join('、');
+        addLog(room, mapping.playerId, 'discard', `丢弃了 ${discardDetails}`);
         broadcastGameState(io, room);
 
         // 检查是否所有人都丢弃完毕
@@ -1037,8 +1045,18 @@ export function initCatanSocketServer(httpServer: HttpServer): void {
           return;
         }
 
+        // 记录抢夺前的资源，用于计算抢到了什么
+        const prevResources = { ...prevState.players[prevState.currentPlayerIndex].resources };
+        const newResources = room.gameState.players[room.gameState.players.findIndex(p => p.id === mapping.playerId)].resources;
+        const targetPlayer = room.gameState.players.find(p => p.id === targetPlayerId);
+        const resourceNames: Record<string, string> = { wood: '木材', brick: '黏土', sheep: '羊毛', wheat: '小麦', ore: '矿石' };
+        const stolenType = (['wood', 'brick', 'sheep', 'wheat', 'ore'] as const).find(
+          r => newResources[r] > prevResources[r]
+        );
+        const stolenName = stolenType ? resourceNames[stolenType] : '资源';
+
         clearTimer(roomId!, 'turn');
-        addLog(room, mapping.playerId, 'steal', '抢夺了资源');
+        addLog(room, mapping.playerId, 'steal', `从 ${targetPlayer?.name || '玩家'} 抢夺了 1 张${stolenName}`);
         broadcastGameState(io, room);
         startTurnTimer(io, roomId!);
       } catch (err) {

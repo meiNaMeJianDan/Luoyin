@@ -103,15 +103,14 @@ export default function CatanResult() {
             再来一局
           </Button>
           <Button
-            variant="outline"
-            className="w-full h-11 text-white border-white/20 hover:bg-white/10"
+            className="w-full h-11"
             onClick={() => {
               if (roomId) leaveRoom(roomId)
               clearSession()
               window.location.href = '/catan'
             }}
           >
-            <Home className="size-4 mr-2" />
+            <Home className="size-4 mr-2 " />
             返回首页
           </Button>
         </div>
