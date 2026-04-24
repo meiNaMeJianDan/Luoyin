@@ -41,6 +41,9 @@ import SplendorHome from "./pages/splendor/index";
 import SplendorRoom from "./pages/splendor/Room";
 import SplendorGame from "./pages/splendor/Game";
 import SplendorResult from "./pages/splendor/Result";
+import TarotHome from "./pages/tarot/index";
+import TarotReading from "./pages/tarot/Reading";
+import TarotHistory from "./pages/tarot/History";
 
 const queryClient = new QueryClient();
 
@@ -138,6 +141,11 @@ const App = () => (
           <Route path="/splendor/game/:roomId" element={<SplendorGame />} />
           <Route path="/splendor/result/:roomId" element={<SplendorResult />} />
         </Route>
+
+        {/* 塔罗占卜路由 — 纯前端，不需要后端 */}
+        <Route path="/tarot" element={<Layout><TarotHome /></Layout>} />
+        <Route path="/tarot/reading/:mode" element={<TarotReading />} />
+        <Route path="/tarot/history" element={<TarotHistory />} />
 
         {/* 管理后台路由 — 使用 AdminLayout，独立于前台 */}
         <Route path="/admin" element={<AdminLayout />}>
