@@ -10,6 +10,7 @@ declare global {
   const AlertCircle: typeof import('lucide-react').AlertCircle
   const ArrowLeft: typeof import('lucide-react').ArrowLeft
   const ArrowRight: typeof import('lucide-react').ArrowRight
+  const Award: typeof import('lucide-react').Award
   const Baby: typeof import('lucide-react').Baby
   const Badge: typeof import('lucide-react').Badge
   const Ban: typeof import('lucide-react').Ban
@@ -36,6 +37,7 @@ declare global {
   const Copy: typeof import('lucide-react').Copy
   const Crown: typeof import('lucide-react').Crown
   const Dices: typeof import('lucide-react').Dices
+  const Eraser: typeof import('lucide-react').Eraser
   const File: typeof import('lucide-react').File
   const FileText: typeof import('lucide-react').FileText
   const Filter: typeof import('lucide-react').Filter
@@ -43,6 +45,7 @@ declare global {
   const Form: typeof import('lucide-react').Form
   const Fragment: typeof import('react').Fragment
   const Gamepad2: typeof import('lucide-react').Gamepad2
+  const Gem: typeof import('lucide-react').Gem
   const GripVertical: typeof import('lucide-react').GripVertical
   const GripVerticalIcon: typeof import('lucide-react').GripVerticalIcon
   const Heading2: typeof import('lucide-react').Heading2
@@ -68,6 +71,7 @@ declare global {
   const Loader2Icon: typeof import('lucide-react').Loader2Icon
   const LogOut: typeof import('lucide-react').LogOut
   const Mail: typeof import('lucide-react').Mail
+  const Medal: typeof import('lucide-react').Medal
   const Menu: typeof import('lucide-react').Menu
   const MessageCircle: typeof import('lucide-react').MessageCircle
   const MessageSquare: typeof import('lucide-react').MessageSquare
@@ -77,8 +81,10 @@ declare global {
   const MoreHorizontalIcon: typeof import('lucide-react').MoreHorizontalIcon
   const Navigation: typeof import('lucide-react').Navigation
   const OctagonXIcon: typeof import('lucide-react').OctagonXIcon
+  const Paintbrush: typeof import('lucide-react').Paintbrush
   const Palette: typeof import('lucide-react').Palette
   const PanelLeftIcon: typeof import('lucide-react').PanelLeftIcon
+  const Pen: typeof import('lucide-react').Pen
   const Pencil: typeof import('lucide-react').Pencil
   const PlaySquare: typeof import('lucide-react').PlaySquare
   const Plus: typeof import('lucide-react').Plus
@@ -90,6 +96,7 @@ declare global {
   const Search: typeof import('lucide-react').Search
   const SearchIcon: typeof import('lucide-react').SearchIcon
   const Section: typeof import('lucide-react').Section
+  const Send: typeof import('lucide-react').Send
   const Sheet: typeof import('lucide-react').Sheet
   const ShieldCheck: typeof import('lucide-react').ShieldCheck
   const ShieldQuestion: typeof import('lucide-react').ShieldQuestion
@@ -103,6 +110,7 @@ declare global {
   const Trash2: typeof import('lucide-react').Trash2
   const TriangleAlertIcon: typeof import('lucide-react').TriangleAlertIcon
   const Trophy: typeof import('lucide-react').Trophy
+  const Undo2: typeof import('lucide-react').Undo2
   const Upload: typeof import('lucide-react').Upload
   const User: typeof import('lucide-react').User
   const UserRound: typeof import('lucide-react').UserRound

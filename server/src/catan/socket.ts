@@ -7,7 +7,6 @@
  */
 
 import { Server as SocketIOServer } from 'socket.io';
-import type { Server as HttpServer } from 'http';
 import type { Socket } from 'socket.io';
 import type { ResourceMap, DevCardType, DevCardParams } from './types.js';
 import {
@@ -520,15 +519,7 @@ function handleGameOver(io: SocketIOServer, room: NonNullable<ReturnType<typeof 
  * 初始化卡坦岛 Socket.io 事件处理
  * 复用已有的 httpServer（与 UNO 共享），通过 catan: 前缀隔离事件
  */
-export function initCatanSocketServer(httpServer: HttpServer): void {
-  // 复用已有的 Socket.io 实例（UNO 已创建）
-  // 通过获取已绑定到 httpServer 上的 io 实例
-  const io = new SocketIOServer(httpServer, {
-    cors: {
-      origin: process.env.CORS_ORIGIN || '*',
-      methods: ['GET', 'POST'],
-    },
-  });
+export function initCatanSocketServer(io: SocketIOServer): void {
 
   io.on('connection', (socket: Socket) => {
     // ========================================================

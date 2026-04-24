@@ -18,6 +18,9 @@ import adminStatsRouter from './routes/admin/stats.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 import { initSocketServer } from './uno/socket.js';
 import { initCatanSocketServer } from './catan/socket.js';
+import { initHalliSocket } from './halli/socket.js';
+import { initDrawSocket } from './draw/socket.js';
+import { initSplendorSocket } from './splendor/socket.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,11 +30,20 @@ const app = express();
 // 将 Express app 包装为 HTTP server，以便集成 Socket.io
 const httpServer = createServer(app);
 
-// 初始化 Socket.io（UNO）
-initSocketServer(httpServer);
+// 初始化 Socket.io（UNO 创建唯一的 io 实例，其他游戏共享）
+const io = initSocketServer(httpServer);
 
-// 初始化卡坦岛 Socket.io 事件（与 UNO 共享 httpServer，通过事件前缀隔离）
-initCatanSocketServer(httpServer);
+// 初始化卡坦岛 Socket.io 事件（共享 io 实例，通过事件前缀隔离）
+initCatanSocketServer(io);
+
+// 初始化德国心脏病 Socket.io 事件（共享 io 实例，通过 halli: 前缀隔离）
+initHalliSocket(io);
+
+// 初始化你画我猜 Socket.io 事件（共享 io 实例，通过 draw: 前缀隔离）
+initDrawSocket(io);
+
+// 初始化璀璨宝石 Socket.io 事件（共享 io 实例，通过 splendor: 前缀隔离）
+initSplendorSocket(io);
 
 // 启用 JSON 请求体解析
 app.use(express.json());

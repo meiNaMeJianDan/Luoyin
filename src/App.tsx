@@ -26,6 +26,21 @@ import CatanHome from "./pages/catan/index";
 import CatanRoom from "./pages/catan/Room";
 import CatanGame from "./pages/catan/Game";
 import CatanResult from "./pages/catan/Result";
+import { HalliGameProvider } from "./pages/halli/context/HalliGameContext";
+import HalliHome from "./pages/halli/index";
+import HalliRoom from "./pages/halli/Room";
+import HalliGame from "./pages/halli/Game";
+import HalliResult from "./pages/halli/Result";
+import { DrawGameProvider } from "./pages/draw/context/DrawGameContext";
+import DrawHome from "./pages/draw/index";
+import DrawRoom from "./pages/draw/Room";
+import DrawGame from "./pages/draw/Game";
+import DrawResult from "./pages/draw/Result";
+import { SplendorGameProvider } from "./pages/splendor/context/SplendorGameContext";
+import SplendorHome from "./pages/splendor/index";
+import SplendorRoom from "./pages/splendor/Room";
+import SplendorGame from "./pages/splendor/Game";
+import SplendorResult from "./pages/splendor/Result";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +113,30 @@ const App = () => (
           <Route path="/catan/room/:roomId" element={<CatanRoom />} />
           <Route path="/catan/game/:roomId" element={<CatanGame />} />
           <Route path="/catan/result/:roomId" element={<CatanResult />} />
+        </Route>
+
+        {/* 德国心脏病游戏路由 — 共享一个 HalliGameProvider，避免页面切换时重建 Socket 连接 */}
+        <Route element={<HalliGameProvider />}>
+          <Route path="/halli" element={<HalliHome />} />
+          <Route path="/halli/room/:roomId" element={<HalliRoom />} />/
+          <Route path="/halli/game/:roomId" element={<HalliGame />} />
+          <Route path="/halli/result/:roomId" element={<HalliResult />} />
+        </Route>
+
+        {/* 你画我猜游戏路由 — 共享一个 DrawGameProvider，避免页面切换时重建 Socket 连接 */}
+        <Route element={<DrawGameProvider />}>
+          <Route path="/draw" element={<DrawHome />} />
+          <Route path="/draw/room/:roomId" element={<DrawRoom />} />
+          <Route path="/draw/game/:roomId" element={<DrawGame />} />
+          <Route path="/draw/result/:roomId" element={<DrawResult />} />
+        </Route>
+
+        {/* 璀璨宝石游戏路由 — 共享一个 SplendorGameProvider，避免页面切换时重建 Socket 连接 */}
+        <Route element={<SplendorGameProvider />}>
+          <Route path="/splendor" element={<SplendorHome />} />
+          <Route path="/splendor/room/:roomId" element={<SplendorRoom />} />
+          <Route path="/splendor/game/:roomId" element={<SplendorGame />} />
+          <Route path="/splendor/result/:roomId" element={<SplendorResult />} />
         </Route>
 
         {/* 管理后台路由 — 使用 AdminLayout，独立于前台 */}
