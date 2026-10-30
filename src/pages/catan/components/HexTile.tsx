@@ -104,8 +104,8 @@ export default function HexTile({ tile, x, y, size, onClick, onHover, highlighte
       <text
         textAnchor="middle"
         dominantBaseline="central"
-        y={numberToken !== null ? -size * 0.35 : 0}
-        fontSize={size * 0.35}
+        y={numberToken !== null ? -size * 0.38 : 0}
+        fontSize={size * 0.40}
       >
         {TERRAIN_ICONS[tile.terrain] || ''}
       </text>
@@ -113,25 +113,25 @@ export default function HexTile({ tile, x, y, size, onClick, onHover, highlighte
       {/* 资源点数标记 */}
       {numberToken !== null && (
         <>
-          <circle r={size * 0.28} fill="#f5f0dc" stroke="#8b7355" strokeWidth={1} />
+          <circle r={size * 0.30} fill="#f5f0dc" stroke="#8b7355" strokeWidth={1} />
           <text
             textAnchor="middle"
             dominantBaseline="central"
             dy={-1}
-            fontSize={size * 0.28}
+            fontSize={size * 0.30}
             fontWeight="bold"
             fill={isHighNumber ? '#dc2626' : '#333'}
           >
             {numberToken}
           </text>
           {/* 概率点 */}
-          <g transform={`translate(0, ${size * 0.16})`}>
+          <g transform={`translate(0, ${size * 0.18})`}>
             {Array.from({ length: dots }).map((_, i) => (
               <circle
                 key={i}
-                cx={(i - (dots - 1) / 2) * 4}
+                cx={(i - (dots - 1) / 2) * 5}
                 cy={0}
-                r={1.5}
+                r={2}
                 fill={isHighNumber ? '#dc2626' : '#666'}
               />
             ))}
@@ -142,11 +142,11 @@ export default function HexTile({ tile, x, y, size, onClick, onHover, highlighte
       {/* 强盗标识 */}
       {hasRobber && (
         <>
-          <circle r={size * 0.22} fill="rgba(0,0,0,0.7)" />
+          <circle r={size * 0.25} fill="rgba(0,0,0,0.7)" />
           <text
             textAnchor="middle"
             dominantBaseline="central"
-            fontSize={size * 0.25}
+            fontSize={size * 0.30}
           >
             💀
           </text>

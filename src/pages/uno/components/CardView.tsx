@@ -31,15 +31,15 @@ const colorTextMap: Record<CardColor, string> = {
 function getCardDisplay(card: Card) {
   switch (card.value) {
     case 'skip':
-      return { icon: <Ban className="size-6" />, label: '禁' }
+      return { icon: <Ban className="size-8" />, label: '禁' }
     case 'reverse':
-      return { icon: <RefreshCw className="size-6" />, label: '转' }
+      return { icon: <RefreshCw className="size-8" />, label: '转' }
     case 'draw_two':
-      return { icon: <Plus className="size-6" />, label: '+2' }
+      return { icon: <Plus className="size-8" />, label: '+2' }
     case 'wild':
-      return { icon: <Palette className="size-6" />, label: '变' }
+      return { icon: <Palette className="size-8" />, label: '变' }
     case 'wild_draw_four':
-      return { icon: <Plus className="size-6" />, label: '+4' }
+      return { icon: <Plus className="size-8" />, label: '+4' }
     default:
       return { icon: null, label: String(card.value) }
   }
@@ -67,9 +67,9 @@ export default function CardView({
   className,
 }: CardViewProps) {
   const sizeClasses = {
-    sm: 'w-10 h-14 text-xs rounded-md',
-    md: 'w-14 h-20 text-sm rounded-lg',
-    lg: 'w-20 h-28 text-base rounded-xl',
+    sm: 'w-14 h-20 text-base rounded-lg',
+    md: 'w-[5.5rem] h-[7.5rem] text-lg rounded-xl',
+    lg: 'w-28 h-[9.25rem] text-xl rounded-xl',
   }
 
   // 牌背面
@@ -85,7 +85,7 @@ export default function CardView({
         )}
       >
         <div className="text-white font-black opacity-50">
-          <HelpCircle className="size-5" />
+          <HelpCircle className="size-7" />
         </div>
       </div>
     )
@@ -111,11 +111,11 @@ export default function CardView({
       {icon ? (
         <div className="flex flex-col items-center gap-0.5">
           {icon}
-          <span className="text-[10px] leading-none">{label}</span>
+          <span className="text-sm leading-none">{label}</span>
         </div>
       ) : (
         <span className={cn(
-          size === 'lg' ? 'text-3xl' : size === 'md' ? 'text-2xl' : 'text-lg',
+          size === 'lg' ? 'text-5xl' : size === 'md' ? 'text-4xl' : 'text-2xl',
           'font-black drop-shadow-sm',
         )}>
           {label}

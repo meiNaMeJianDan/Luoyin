@@ -8,6 +8,7 @@ import GameDetail from "./pages/GameDetail";
 import BeginnersGuide from "./pages/BeginnersGuide";
 import Trending from "./pages/Trending";
 import About from "./pages/About";
+import OnlineGames from "./pages/OnlineGames";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import GamesManage from "./pages/admin/GamesManage";
@@ -98,6 +99,14 @@ const App = () => (
           element={
             <Layout>
               <About />
+            </Layout>
+          }
+        />
+        <Route
+          path="/online"
+          element={
+            <Layout>
+              <OnlineGames />
             </Layout>
           }
         />

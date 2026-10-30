@@ -54,18 +54,18 @@ export const GameLog = React.memo(function GameLog({ log }: GameLogProps) {
   return (
     <div className="w-full max-w-sm bg-white rounded-lg border border-gray-200 shadow-sm">
       <div className="px-3 py-2 border-b border-gray-100">
-        <h3 className="text-sm font-medium text-gray-700">📋 游戏日志</h3>
+        <h3 className="text-base font-medium text-gray-700">📋 游戏日志</h3>
       </div>
 
       <div
         ref={scrollRef}
-        className="max-h-48 overflow-y-auto px-3 py-2 space-y-1.5"
+        className="max-h-56 overflow-y-auto px-3 py-2 space-y-2"
       >
         {log.length === 0 ? (
-          <p className="text-xs text-gray-400 text-center py-4">暂无操作记录</p>
+          <p className="text-sm text-gray-400 text-center py-4">暂无操作记录</p>
         ) : (
           log.map((entry, index) => (
-            <div key={index} className="flex items-start gap-2 text-xs">
+            <div key={index} className="flex items-start gap-2 text-sm">
               <span className="text-gray-400 shrink-0 font-mono">
                 {formatTime(entry.timestamp)}
               </span>

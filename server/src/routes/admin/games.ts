@@ -3,7 +3,8 @@
 
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import { getDb } from '../../db.js';
+import { execute, queryOne, withTransaction } from '../../db.js';
+import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { validate, validateId } from '../../middleware/validation.js';
 import { gameSchema, gameDetailSchema } from './schemas.js';
 import type { Game, GameDetail } from '../../types.js';
@@ -22,114 +23,12 @@ function rowToGame(row: any): Game {
     difficulty: row.difficulty,
     tags: JSON.parse(row.tags),
     isHot: row.is_hot === 1,
-    rank: row.rank ?? undefined,
+    // game_rank：避免使用 MySQL 保留字 rank
+    rank: row.game_rank ?? undefined,
     comment: row.comment ?? undefined,
     isTrending: row.is_trending === 1,
   };
 }
-
-// POST / - 创建游戏
-router.post('/', validate(gameSchema), (req: Request, res: Response) => {
-  try {
-    const db = getDb();
-    const { title, type, players, time, image, difficulty, tags, isHot, rank, comment, isTrending } = req.body;
-
-    const result = db.prepare(`
-      INSERT INTO games (title, type, players, time, image, difficulty, tags, is_hot, rank, comment, is_trending)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      title,
-      type,
-      players,
-      time,
-      image,
-      difficulty,
-      JSON.stringify(tags),
-      isHot ? 1 : 0,
-      rank ?? null,
-      comment ?? null,
-      isTrending ? 1 : 0,
-    );
-
-    // 查询刚插入的完整记录
-    const row = db.prepare('SELECT * FROM games WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json({ data: rowToGame(row) });
-  } catch (error) {
-    console.error('创建游戏失败:', error);
-    res.status(500).json({ error: '服务器内部错误' });
-  }
-});
-
-
-// PUT /:id - 更新游戏
-router.put('/:id', validateId, validate(gameSchema), (req: Request, res: Response) => {
-  try {
-    const db = getDb();
-    const id = Number(req.params.id);
-    const { title, type, players, time, image, difficulty, tags, isHot, rank, comment, isTrending } = req.body;
-
-    // 检查游戏是否存在
-    const existing = db.prepare('SELECT id FROM games WHERE id = ?').get(id);
-    if (!existing) {
-      res.status(404).json({ error: '游戏不存在' });
-      return;
-    }
-
-    db.prepare(`
-      UPDATE games
-      SET title = ?, type = ?, players = ?, time = ?, image = ?, difficulty = ?, tags = ?,
-          is_hot = ?, rank = ?, comment = ?, is_trending = ?
-      WHERE id = ?
-    `).run(
-      title,
-      type,
-      players,
-      time,
-      image,
-      difficulty,
-      JSON.stringify(tags),
-      isHot ? 1 : 0,
-      rank ?? null,
-      comment ?? null,
-      isTrending ? 1 : 0,
-      id,
-    );
-
-    // 查询更新后的完整记录
-    const row = db.prepare('SELECT * FROM games WHERE id = ?').get(id);
-    res.status(200).json({ data: rowToGame(row) });
-  } catch (error) {
-    console.error('更新游戏失败:', error);
-    res.status(500).json({ error: '服务器内部错误' });
-  }
-});
-
-// DELETE /:id - 删除游戏（级联删除游戏详情）
-router.delete('/:id', validateId, (req: Request, res: Response) => {
-  try {
-    const db = getDb();
-    const id = Number(req.params.id);
-
-    // 检查游戏是否存在
-    const existing = db.prepare('SELECT id FROM games WHERE id = ?').get(id);
-    if (!existing) {
-      res.status(404).json({ error: '游戏不存在' });
-      return;
-    }
-
-    // 先删除关联的游戏详情，再删除游戏本身
-    const deleteTransaction = db.transaction(() => {
-      db.prepare('DELETE FROM game_details WHERE game_id = ?').run(id);
-      db.prepare('DELETE FROM games WHERE id = ?').run(id);
-    });
-    deleteTransaction();
-
-    res.status(200).json({ data: { message: '游戏删除成功' } });
-  } catch (error) {
-    console.error('删除游戏失败:', error);
-    res.status(500).json({ error: '服务器内部错误' });
-  }
-});
 
 /** 数据库行转换为 GameDetail 对象 */
 function rowToGameDetail(row: any): GameDetail {
@@ -143,113 +42,182 @@ function rowToGameDetail(row: any): GameDetail {
   };
 }
 
+// POST / - 创建游戏
+router.post('/', validate(gameSchema), asyncHandler(async (req: Request, res: Response) => {
+  const { title, type, players, time, image, difficulty, tags, isHot, rank, comment, isTrending } = req.body;
+
+  const result = await execute(
+    `INSERT INTO games (title, type, players, time, image, difficulty, tags, is_hot, game_rank, comment, is_trending)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      title,
+      type,
+      players,
+      time,
+      image,
+      difficulty,
+      JSON.stringify(tags),
+      isHot ? 1 : 0,
+      rank ?? null,
+      comment ?? null,
+      isTrending ? 1 : 0,
+    ],
+  );
+
+  // 查询刚插入的完整记录
+  const row = await queryOne('SELECT * FROM games WHERE id = ?', [result.insertId]);
+  res.status(201).json({ data: rowToGame(row) });
+}));
+
+// PUT /:id - 更新游戏
+router.put('/:id', validateId, validate(gameSchema), asyncHandler(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const { title, type, players, time, image, difficulty, tags, isHot, rank, comment, isTrending } = req.body;
+
+  // 检查游戏是否存在
+  const existing = await queryOne('SELECT id FROM games WHERE id = ?', [id]);
+  if (!existing) {
+    res.status(404).json({ error: '游戏不存在' });
+    return;
+  }
+
+  await execute(
+    `UPDATE games
+     SET title = ?, type = ?, players = ?, time = ?, image = ?, difficulty = ?, tags = ?,
+         is_hot = ?, game_rank = ?, comment = ?, is_trending = ?
+     WHERE id = ?`,
+    [
+      title,
+      type,
+      players,
+      time,
+      image,
+      difficulty,
+      JSON.stringify(tags),
+      isHot ? 1 : 0,
+      rank ?? null,
+      comment ?? null,
+      isTrending ? 1 : 0,
+      id,
+    ],
+  );
+
+  // 查询更新后的完整记录
+  const row = await queryOne('SELECT * FROM games WHERE id = ?', [id]);
+  res.status(200).json({ data: rowToGame(row) });
+}));
+
+// DELETE /:id - 删除游戏（级联删除游戏详情）
+router.delete('/:id', validateId, asyncHandler(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  // 检查游戏是否存在
+  const existing = await queryOne('SELECT id FROM games WHERE id = ?', [id]);
+  if (!existing) {
+    res.status(404).json({ error: '游戏不存在' });
+    return;
+  }
+
+  // 先删除关联的游戏详情，再删除游戏本身
+  await withTransaction(async (connection) => {
+    await connection.query('DELETE FROM game_details WHERE game_id = ?', [id]);
+    await connection.query('DELETE FROM games WHERE id = ?', [id]);
+  });
+
+  res.status(200).json({ data: { message: '游戏删除成功' } });
+}));
+
 // POST /:id/details - 创建游戏详情
-router.post('/:id/details', validateId, validate(gameDetailSchema), (req: Request, res: Response) => {
-  try {
-    const db = getDb();
-    const gameId = Number(req.params.id);
+router.post('/:id/details', validateId, validate(gameDetailSchema), asyncHandler(async (req: Request, res: Response) => {
+  const gameId = Number(req.params.id);
 
-    // 校验游戏是否存在
-    const game = db.prepare('SELECT id FROM games WHERE id = ?').get(gameId);
-    if (!game) {
-      res.status(404).json({ error: '游戏不存在' });
-      return;
-    }
+  // 校验游戏是否存在
+  const game = await queryOne('SELECT id FROM games WHERE id = ?', [gameId]);
+  if (!game) {
+    res.status(404).json({ error: '游戏不存在' });
+    return;
+  }
 
-    // 校验详情是否已存在（不允许重复创建）
-    const existingDetail = db.prepare('SELECT id FROM game_details WHERE game_id = ?').get(gameId);
-    if (existingDetail) {
-      res.status(409).json({ error: '该游戏已存在详情记录' });
-      return;
-    }
+  // 校验详情是否已存在（不允许重复创建）
+  const existingDetail = await queryOne('SELECT id FROM game_details WHERE game_id = ?', [gameId]);
+  if (existingDetail) {
+    res.status(409).json({ error: '该游戏已存在详情记录' });
+    return;
+  }
 
-    const { introduction, objective, victoryConditions, gameplaySteps, tips } = req.body;
+  const { introduction, objective, victoryConditions, gameplaySteps, tips } = req.body;
 
-    db.prepare(`
-      INSERT INTO game_details (game_id, introduction, objective, victory_conditions, gameplay_steps, tips)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(
+  await execute(
+    `INSERT INTO game_details (game_id, introduction, objective, victory_conditions, gameplay_steps, tips)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
       gameId,
       introduction,
       objective,
       JSON.stringify(victoryConditions),
       JSON.stringify(gameplaySteps),
       JSON.stringify(tips),
-    );
+    ],
+  );
 
-    // 查询刚插入的完整记录
-    const row = db.prepare('SELECT * FROM game_details WHERE game_id = ?').get(gameId);
-    res.status(201).json({ data: rowToGameDetail(row) });
-  } catch (error) {
-    console.error('创建游戏详情失败:', error);
-    res.status(500).json({ error: '服务器内部错误' });
-  }
-});
+  // 查询刚插入的完整记录
+  const row = await queryOne('SELECT * FROM game_details WHERE game_id = ?', [gameId]);
+  res.status(201).json({ data: rowToGameDetail(row) });
+}));
 
 // PUT /:id/details - 更新游戏详情
-router.put('/:id/details', validateId, validate(gameDetailSchema), (req: Request, res: Response) => {
-  try {
-    const db = getDb();
-    const gameId = Number(req.params.id);
+router.put('/:id/details', validateId, validate(gameDetailSchema), asyncHandler(async (req: Request, res: Response) => {
+  const gameId = Number(req.params.id);
 
-    // 校验游戏是否存在
-    const game = db.prepare('SELECT id FROM games WHERE id = ?').get(gameId);
-    if (!game) {
-      res.status(404).json({ error: '游戏不存在' });
-      return;
-    }
+  // 校验游戏是否存在
+  const game = await queryOne('SELECT id FROM games WHERE id = ?', [gameId]);
+  if (!game) {
+    res.status(404).json({ error: '游戏不存在' });
+    return;
+  }
 
-    // 校验详情是否存在
-    const existingDetail = db.prepare('SELECT id FROM game_details WHERE game_id = ?').get(gameId);
-    if (!existingDetail) {
-      res.status(404).json({ error: '游戏详情不存在' });
-      return;
-    }
+  // 校验详情是否存在
+  const existingDetail = await queryOne('SELECT id FROM game_details WHERE game_id = ?', [gameId]);
+  if (!existingDetail) {
+    res.status(404).json({ error: '游戏详情不存在' });
+    return;
+  }
 
-    const { introduction, objective, victoryConditions, gameplaySteps, tips } = req.body;
+  const { introduction, objective, victoryConditions, gameplaySteps, tips } = req.body;
 
-    db.prepare(`
-      UPDATE game_details
-      SET introduction = ?, objective = ?, victory_conditions = ?, gameplay_steps = ?, tips = ?
-      WHERE game_id = ?
-    `).run(
+  await execute(
+    `UPDATE game_details
+     SET introduction = ?, objective = ?, victory_conditions = ?, gameplay_steps = ?, tips = ?
+     WHERE game_id = ?`,
+    [
       introduction,
       objective,
       JSON.stringify(victoryConditions),
       JSON.stringify(gameplaySteps),
       JSON.stringify(tips),
       gameId,
-    );
+    ],
+  );
 
-    // 查询更新后的完整记录
-    const row = db.prepare('SELECT * FROM game_details WHERE game_id = ?').get(gameId);
-    res.status(200).json({ data: rowToGameDetail(row) });
-  } catch (error) {
-    console.error('更新游戏详情失败:', error);
-    res.status(500).json({ error: '服务器内部错误' });
-  }
-});
+  // 查询更新后的完整记录
+  const row = await queryOne('SELECT * FROM game_details WHERE game_id = ?', [gameId]);
+  res.status(200).json({ data: rowToGameDetail(row) });
+}));
 
 // DELETE /:id/details - 删除游戏详情
-router.delete('/:id/details', validateId, (req: Request, res: Response) => {
-  try {
-    const db = getDb();
-    const gameId = Number(req.params.id);
+router.delete('/:id/details', validateId, asyncHandler(async (req: Request, res: Response) => {
+  const gameId = Number(req.params.id);
 
-    // 校验游戏详情是否存在
-    const existingDetail = db.prepare('SELECT id FROM game_details WHERE game_id = ?').get(gameId);
-    if (!existingDetail) {
-      res.status(404).json({ error: '游戏详情不存在' });
-      return;
-    }
-
-    db.prepare('DELETE FROM game_details WHERE game_id = ?').run(gameId);
-
-    res.status(200).json({ data: { message: '游戏详情删除成功' } });
-  } catch (error) {
-    console.error('删除游戏详情失败:', error);
-    res.status(500).json({ error: '服务器内部错误' });
+  // 校验游戏详情是否存在
+  const existingDetail = await queryOne('SELECT id FROM game_details WHERE game_id = ?', [gameId]);
+  if (!existingDetail) {
+    res.status(404).json({ error: '游戏详情不存在' });
+    return;
   }
-});
+
+  await execute('DELETE FROM game_details WHERE game_id = ?', [gameId]);
+
+  res.status(200).json({ data: { message: '游戏详情删除成功' } });
+}));
 
 export default router;

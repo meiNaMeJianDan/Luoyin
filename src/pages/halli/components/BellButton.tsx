@@ -24,12 +24,12 @@ export const BellButton = React.memo(function BellButton({
   isRinging = false,
 }: BellButtonProps) {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-3">
       <button
         onClick={onRing}
         disabled={disabled}
         className={`
-          relative w-20 h-20 rounded-full flex items-center justify-center
+          relative w-28 h-28 rounded-full flex items-center justify-center
           transition-all duration-200 select-none
           ${
             disabled
@@ -41,7 +41,7 @@ export const BellButton = React.memo(function BellButton({
         `}
         aria-label="按铃"
       >
-        <span className="text-4xl">{disabled ? '🔕' : '🔔'}</span>
+        <span className="text-5xl">{disabled ? '🔕' : '🔔'}</span>
 
         {/* 按铃可用时的脉冲提示 */}
         {!disabled && (
@@ -49,7 +49,7 @@ export const BellButton = React.memo(function BellButton({
         )}
       </button>
 
-      <span className={`text-xs ${disabled ? 'text-gray-400' : 'text-yellow-600 font-medium'}`}>
+      <span className={`text-sm ${disabled ? 'text-gray-400' : 'text-yellow-600 font-medium'}`}>
         {disabled ? '等待翻牌' : '快按铃！'}
       </span>
 

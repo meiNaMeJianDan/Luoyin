@@ -12,15 +12,26 @@ interface WordHintProps {
   hint: string[]
   /** 当前词语（仅 Drawer 可见，Guesser 为 null） */
   currentWord?: string | null
+  /** 是否启用词语提示（关闭时猜词者不显示任何提示） */
+  hintsEnabled?: boolean
 }
 
-const WordHint = React.memo(function WordHint({ hint, currentWord }: WordHintProps) {
+const WordHint = React.memo(function WordHint({ hint, currentWord, hintsEnabled = true }: WordHintProps) {
   /* Drawer 直接显示完整词语 */
   if (currentWord) {
     return (
       <div className="flex items-center justify-center gap-1 py-2">
         <span className="text-lg font-bold text-amber-600 tracking-widest">{currentWord}</span>
         <span className="text-xs text-amber-400 ml-2">（你来画）</span>
+      </div>
+    )
+  }
+
+  /* 房主关闭提示：猜词者不显示任何词语信息 */
+  if (!hintsEnabled) {
+    return (
+      <div className="flex items-center justify-center py-2">
+        <span className="text-sm text-gray-400">本局已关闭词语提示</span>
       </div>
     )
   }

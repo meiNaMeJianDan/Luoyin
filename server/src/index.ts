@@ -6,7 +6,7 @@ import { createServer } from 'http';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getDb } from './db.js';
+import { initDb } from './db.js';
 import gamesRouter from './routes/games.js';
 import categoriesRouter from './routes/categories.js';
 import guideRouter from './routes/guide.js';
@@ -59,8 +59,8 @@ app.use(cors({
 // 使用 path.join 确保跨平台兼容
 app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images')));
 
-// 可配置端口，默认 3001，支持环境变量 PORT 覆盖
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
+// 可配置端口，默认 5050，支持环境变量 PORT 覆盖
+const PORT = process.env.PORT ? Number(process.env.PORT) : 5050;
 
 // 注册只读 API 路由
 app.use('/api/games', gamesRouter);
@@ -79,9 +79,9 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // 启动服务
-function start(): void {
-  // 启动时连接数据库（getDb 内部会处理连接失败并 process.exit(1)）
-  getDb();
+async function start(): Promise<void> {
+  // 启动时验证数据库连接（initDb 内部会处理连接失败并 process.exit(1)）
+  await initDb();
 
   // 使用 httpServer.listen 替代 app.listen，以支持 Socket.io WebSocket 连接
   httpServer.listen(PORT, () => {
@@ -93,7 +93,10 @@ function start(): void {
 // 判断当前模块是否为入口模块
 const isMainModule = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 if (isMainModule) {
-  start();
+  start().catch((error) => {
+    console.error('服务启动失败:', error);
+    process.exit(1);
+  });
 }
 
 // 导出 app 实例供测试使用

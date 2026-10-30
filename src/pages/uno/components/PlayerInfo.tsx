@@ -28,7 +28,7 @@ export default function PlayerInfo({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300',
+        'flex items-center gap-3 px-4 py-4 rounded-2xl transition-all duration-300',
         isCurrentTurn
           ? 'bg-yellow-400/90 text-yellow-900 shadow-lg shadow-yellow-400/30 scale-105'
           : 'bg-white/20 text-white',
@@ -37,27 +37,27 @@ export default function PlayerInfo({
     >
       {/* 头像 */}
       <div className={cn(
-        'w-8 h-8 rounded-full flex items-center justify-center',
+        'w-12 h-12 rounded-full flex items-center justify-center',
         isCurrentTurn ? 'bg-yellow-600/30' : 'bg-white/20',
       )}>
         {player.isAI ? (
-          <Bot className="size-4" />
+          <Bot className="size-6" />
         ) : (
-          <UserRound className="size-4" />
+          <UserRound className="size-6" />
         )}
       </div>
 
       {/* 信息 */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1">
-          <span className="text-sm font-medium truncate">{player.name}</span>
-          {!player.isConnected && <WifiOff className="size-3 text-red-300" />}
+          <span className="text-lg font-medium truncate">{player.name}</span>
+          {!player.isConnected && <WifiOff className="size-4 text-red-300" />}
           {player.calledUno && (
-            <span className="text-[10px] bg-red-500 text-white px-1 rounded">UNO</span>
+            <span className="text-sm bg-red-500 text-white px-2 py-0.5 rounded">UNO</span>
           )}
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-xs opacity-70">{player.handCount} 张牌</span>
+          <span className="text-base opacity-70">{player.handCount} 张牌</span>
         </div>
       </div>
 
@@ -65,7 +65,7 @@ export default function PlayerInfo({
       {canReport && (
         <button
           onClick={onReportUno}
-          className="text-[10px] bg-red-500/80 hover:bg-red-500 text-white px-2 py-0.5 rounded-full transition-colors"
+          className="text-sm bg-red-500/80 hover:bg-red-500 text-white px-3 py-1.5 rounded-full transition-colors"
         >
           举报
         </button>

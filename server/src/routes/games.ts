@@ -3,7 +3,8 @@
 
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import { getDb } from '../db.js';
+import { query, queryOne } from '../db.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 import type { Game, GameDetail } from '../types.js';
 
 const router = Router();
@@ -20,7 +21,8 @@ function rowToGame(row: any): Game {
     difficulty: row.difficulty,
     tags: JSON.parse(row.tags),
     isHot: row.is_hot === 1,
-    rank: row.rank ?? undefined,
+    // game_rank：避免使用 MySQL 保留字 rank
+    rank: row.game_rank ?? undefined,
     comment: row.comment ?? undefined,
     isTrending: row.is_trending === 1,
   };
@@ -39,33 +41,27 @@ function rowToGameDetail(row: any): GameDetail {
 }
 
 // GET /api/games - 获取所有游戏列表
-router.get('/', (_req: Request, res: Response) => {
-  const db = getDb();
-  const rows = db.prepare('SELECT * FROM games').all();
-  const games = rows.map(rowToGame);
-  res.json({ data: games });
-});
+router.get('/', asyncHandler(async (_req: Request, res: Response) => {
+  const rows = await query('SELECT * FROM games');
+  res.json({ data: rows.map(rowToGame) });
+}));
 
 // GET /api/games/trending - 获取热门游戏（isTrending 为 true）
 // 注意：必须在 /:id 路由之前注册，避免 "trending" 被当作 :id 解析
-router.get('/trending', (_req: Request, res: Response) => {
-  const db = getDb();
-  const rows = db.prepare('SELECT * FROM games WHERE is_trending = 1').all();
-  const games = rows.map(rowToGame);
-  res.json({ data: games });
-});
+router.get('/trending', asyncHandler(async (_req: Request, res: Response) => {
+  const rows = await query('SELECT * FROM games WHERE is_trending = 1');
+  res.json({ data: rows.map(rowToGame) });
+}));
 
-// GET /api/games/ranked - 获取排行榜游戏，按 rank 升序排列
+// GET /api/games/ranked - 获取排行榜游戏，按 game_rank 升序排列
 // 注意：必须在 /:id 路由之前注册，避免 "ranked" 被当作 :id 解析
-router.get('/ranked', (_req: Request, res: Response) => {
-  const db = getDb();
-  const rows = db.prepare('SELECT * FROM games WHERE rank IS NOT NULL ORDER BY rank ASC').all();
-  const games = rows.map(rowToGame);
-  res.json({ data: games });
-});
+router.get('/ranked', asyncHandler(async (_req: Request, res: Response) => {
+  const rows = await query('SELECT * FROM games WHERE game_rank IS NOT NULL ORDER BY game_rank ASC');
+  res.json({ data: rows.map(rowToGame) });
+}));
 
 // GET /api/games/:id - 获取指定游戏
-router.get('/:id', (req: Request, res: Response) => {
+router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   // id 非数字返回 400
@@ -74,8 +70,7 @@ router.get('/:id', (req: Request, res: Response) => {
     return;
   }
 
-  const db = getDb();
-  const row = db.prepare('SELECT * FROM games WHERE id = ?').get(Number(id));
+  const row = await queryOne('SELECT * FROM games WHERE id = ?', [Number(id)]);
 
   if (!row) {
     res.status(404).json({ error: '游戏不存在' });
@@ -83,10 +78,10 @@ router.get('/:id', (req: Request, res: Response) => {
   }
 
   res.json({ data: rowToGame(row) });
-});
+}));
 
 // GET /api/games/:id/details - 获取游戏详情
-router.get('/:id/details', (req: Request, res: Response) => {
+router.get('/:id/details', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   // id 非数字返回 400
@@ -95,15 +90,10 @@ router.get('/:id/details', (req: Request, res: Response) => {
     return;
   }
 
-  const db = getDb();
-  const row = db.prepare('SELECT * FROM game_details WHERE game_id = ?').get(Number(id));
+  const row = await queryOne('SELECT * FROM game_details WHERE game_id = ?', [Number(id)]);
 
-  if (!row) {
-    res.status(404).json({ error: '游戏详情不存在' });
-    return;
-  }
-
-  res.json({ data: rowToGameDetail(row) });
-});
+  // 详情属于可选内容：未录入时返回 null，由前端展示“筹备中”占位，不作为错误处理
+  res.json({ data: row ? rowToGameDetail(row) : null });
+}));
 
 export default router;

@@ -15,7 +15,7 @@ interface DrawPileProps {
 export default function DrawPile({ count, isMyTurn, onDraw }: DrawPileProps) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <p className="text-xs text-white/70">摸牌堆</p>
+      <p className="text-sm text-white/70">摸牌堆</p>
       <div className="relative">
         <div
           onClick={isMyTurn ? onDraw : undefined}
@@ -28,7 +28,7 @@ export default function DrawPile({ count, isMyTurn, onDraw }: DrawPileProps) {
           />
         </div>
         {/* 剩余数量 */}
-        <div className="absolute -bottom-1 -left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+        <div className="absolute -bottom-1 -left-1 bg-black/70 text-white text-sm px-2.5 py-1 rounded-full">
           {count}
         </div>
       </div>

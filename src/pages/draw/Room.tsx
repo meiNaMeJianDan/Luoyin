@@ -7,6 +7,7 @@
 
 import { useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import { useGame } from './hooks/useGame'
 import { toast } from 'sonner'
 import type { GameConfig } from './context/DrawGameContext'
@@ -36,6 +37,8 @@ export default function DrawRoom() {
   // 游戏配置
   const [rounds, setRounds] = useState(2)
   const [turnDuration, setTurnDuration] = useState(90)
+  // 是否给猜词者提供字符提示（40%/70% 时自动揭示）
+  const [hintsEnabled, setHintsEnabled] = useState(true)
 
   const handleCopy = async () => {
     if (!roomId) return
@@ -63,7 +66,7 @@ export default function DrawRoom() {
     roomInfo.players.every((p) => p.isHost || p.isReady)
 
   const handleStartGame = () => {
-    const config: GameConfig = { rounds, turnDuration }
+    const config: GameConfig = { rounds, turnDuration, hintsEnabled }
     startGame(config)
   }
 
@@ -182,6 +185,21 @@ export default function DrawRoom() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* 词语提示开关 */}
+            <div className="flex items-center justify-between">
+              <div className="pr-3">
+                <span className="text-sm text-gray-600">词语提示</span>
+                <p className="text-xs text-gray-400">
+                  {hintsEnabled ? '回合中自动揭示部分字符' : '猜词者不会获得任何字符提示'}
+                </p>
+              </div>
+              <Switch
+                checked={hintsEnabled}
+                onCheckedChange={setHintsEnabled}
+                aria-label="是否启用词语提示"
+              />
             </div>
           </div>
         )}

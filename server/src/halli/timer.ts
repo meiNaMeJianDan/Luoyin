@@ -13,7 +13,7 @@ import {
   AI_FLIP_DELAY_MAX,
   AI_BELL_DELAY_MIN,
   AI_BELL_DELAY_MAX,
-} from './types';
+} from './types.js';
 
 // ============================================================
 // 计时器类型

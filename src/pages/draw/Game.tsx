@@ -142,6 +142,7 @@ export default function DrawGame() {
           <WordHint
             hint={gameState.hint}
             currentWord={isDrawer ? gameState.currentWord : null}
+            hintsEnabled={gameState.config.hintsEnabled}
           />
 
           {/* 画板（含结算叠加层） */}

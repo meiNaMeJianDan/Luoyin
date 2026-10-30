@@ -430,9 +430,9 @@ export function toClientGameState(
     hasGuessedCorrect: p.hasGuessedCorrect,
   }));
 
-  // 生成词语提示
+  // 生成词语提示（关闭提示时不返回任何提示信息，避免泄露字数）
   let hint: string[] = [];
-  if (state.hintState) {
+  if (state.hintState && state.config.hintsEnabled) {
     const revealedSet = new Set(state.hintState.revealedIndices);
     hint = state.hintState.chars.map((char, index) =>
       revealedSet.has(index) ? char : '_',

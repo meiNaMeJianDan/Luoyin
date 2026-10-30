@@ -37,7 +37,7 @@ export default function ColorPicker({ open, onChoose }: ColorPickerProps) {
             <button
               key={color}
               onClick={() => onChoose(color)}
-              className={`${bg} ${hover} text-white font-bold text-lg h-16 rounded-xl transition-all active:scale-95 shadow-md`}
+              className={`${bg} ${hover} text-white font-bold text-xl h-20 rounded-xl transition-all active:scale-95 shadow-md`}
             >
               {label}
             </button>

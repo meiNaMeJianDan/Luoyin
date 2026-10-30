@@ -41,6 +41,8 @@ export interface DrawAction {
 export interface GameConfig {
   rounds: number
   turnDuration: number
+  /** 是否启用词语提示 */
+  hintsEnabled: boolean
 }
 
 /** 游戏阶段 */

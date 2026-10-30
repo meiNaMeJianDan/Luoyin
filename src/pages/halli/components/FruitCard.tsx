@@ -26,9 +26,9 @@ const FRUIT_BG: Record<FruitType, string> = {
 
 /** 尺寸映射 */
 const SIZE_MAP = {
-  sm: { card: 'w-14 h-20', emoji: 'text-sm', gap: 'gap-0.5' },
-  md: { card: 'w-20 h-28', emoji: 'text-lg', gap: 'gap-1' },
-  lg: { card: 'w-28 h-40', emoji: 'text-2xl', gap: 'gap-1' },
+  sm: { card: 'w-16 h-24', emoji: 'text-base', gap: 'gap-1' },
+  md: { card: 'w-24 h-32', emoji: 'text-xl', gap: 'gap-1' },
+  lg: { card: 'w-32 h-44', emoji: 'text-3xl', gap: 'gap-1.5' },
 } as const
 
 interface FruitCardProps {

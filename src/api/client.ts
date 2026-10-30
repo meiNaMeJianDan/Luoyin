@@ -76,8 +76,12 @@ export interface GuideStep {
 
 // ============ API 客户端配置 ============
 
-/** 基础 URL，支持 VITE_API_BASE_URL 环境变量覆盖 */
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+/**
+ * 基础 URL
+ * 默认使用相对路径，由 Vite 开发代理（本地）或 Nginx（线上）转发到后端。
+ * 如需直连独立的后端域名，可通过 VITE_API_BASE_URL 覆盖。
+ */
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
 // ============ 通用 fetch 封装 ============
 
@@ -129,9 +133,9 @@ export async function fetchGameById(id: number): Promise<Game> {
   return request<Game>(`/api/games/${id}`);
 }
 
-/** 根据游戏 ID 获取游戏详情 */
-export async function fetchGameDetails(id: number): Promise<GameDetail> {
-  return request<GameDetail>(`/api/games/${id}/details`);
+/** 根据游戏 ID 获取游戏详情（未录入时返回 null） */
+export async function fetchGameDetails(id: number): Promise<GameDetail | null> {
+  return request<GameDetail | null>(`/api/games/${id}/details`);
 }
 
 // ============ 分类相关 API ============

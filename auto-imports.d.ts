@@ -14,6 +14,7 @@ declare global {
   const Baby: typeof import('lucide-react').Baby
   const Badge: typeof import('lucide-react').Badge
   const Ban: typeof import('lucide-react').Ban
+  const Bell: typeof import('lucide-react').Bell
   const Bold: typeof import('lucide-react').Bold
   const BookOpen: typeof import('lucide-react').BookOpen
   const BookmarkPlus: typeof import('lucide-react').BookmarkPlus
@@ -47,6 +48,7 @@ declare global {
   const Form: typeof import('lucide-react').Form
   const Fragment: typeof import('react').Fragment
   const Gamepad2: typeof import('lucide-react').Gamepad2
+  const Gem: typeof import('lucide-react').Gem
   const Grid: typeof import('lucide-react').Grid
   const GripVertical: typeof import('lucide-react').GripVertical
   const GripVerticalIcon: typeof import('lucide-react').GripVerticalIcon
@@ -54,6 +56,7 @@ declare global {
   const Heading3: typeof import('lucide-react').Heading3
   const Heart: typeof import('lucide-react').Heart
   const HelpCircle: typeof import('lucide-react').HelpCircle
+  const Hexagon: typeof import('lucide-react').Hexagon
   const Home: typeof import('lucide-react').Home
   const Icon: typeof import('lucide-react').Icon
   const Image: typeof import('lucide-react').Image
@@ -61,6 +64,7 @@ declare global {
   const Info: typeof import('lucide-react').Info
   const InfoIcon: typeof import('lucide-react').InfoIcon
   const Italic: typeof import('lucide-react').Italic
+  const Layers: typeof import('lucide-react').Layers
   const Layout: typeof import('lucide-react').Layout
   const LayoutDashboard: typeof import('lucide-react').LayoutDashboard
   const Link: typeof import('lucide-react').Link

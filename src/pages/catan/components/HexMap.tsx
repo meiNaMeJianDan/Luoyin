@@ -250,7 +250,7 @@ export default function HexMap({
   const highlightHexes = interactionMode === 'move_robber' || gameState.phase === 'move_robber'
 
   // SVG 视口计算 — flat-top 六边形
-  const padding = 60
+  const padding = 70
   const viewBox = useMemo(() => {
     const tiles = map?.tiles
     if (!tiles || tiles.length === 0) {
@@ -321,7 +321,7 @@ export default function HexMap({
           // 从地图中心(0,0)向外的方向
           const dist = Math.sqrt(mx * mx + my * my) || 1
           // 港口圆形图标位置：沿外推方向放置在地图外围
-          const iconDist = 65
+          const iconDist = 80
           const ix = mx + (mx / dist) * iconDist
           const iy = my + (my / dist) * iconDist
           const info = HARBOR_INFO[harbor.type]
@@ -331,28 +331,28 @@ export default function HexMap({
             <g key={`harbor-${i}`}>
               {/* V 形连线：从图标到两个顶点 */}
               <line x1={ix} y1={iy} x2={p1.x} y2={p1.y}
-                stroke={isGeneric ? '#aaa' : info.color} strokeWidth={2} opacity={0.7} />
+                stroke={isGeneric ? '#aaa' : info.color} strokeWidth={3} opacity={0.8} />
               <line x1={ix} y1={iy} x2={p2.x} y2={p2.y}
-                stroke={isGeneric ? '#aaa' : info.color} strokeWidth={2} opacity={0.7} />
+                stroke={isGeneric ? '#aaa' : info.color} strokeWidth={3} opacity={0.8} />
               {/* 两个顶点上的小圆点标记 */}
-              <circle cx={p1.x} cy={p1.y} r={3} fill={isGeneric ? '#aaa' : info.color} />
-              <circle cx={p2.x} cy={p2.y} r={3} fill={isGeneric ? '#aaa' : info.color} />
+              <circle cx={p1.x} cy={p1.y} r={4} fill={isGeneric ? '#aaa' : info.color} />
+              <circle cx={p2.x} cy={p2.y} r={4} fill={isGeneric ? '#aaa' : info.color} />
               {/* 港口圆形图标 */}
-              <circle cx={ix} cy={iy} r={18}
+              <circle cx={ix} cy={iy} r={24}
                 fill={isGeneric ? '#555' : 'rgba(0,0,0,0.8)'}
                 stroke={isGeneric ? '#ccc' : info.color}
                 strokeWidth={2} />
               <text x={ix} y={iy}
                 textAnchor="middle" dominantBaseline="central"
-                fontSize={isGeneric ? 11 : 10}
+                fontSize={isGeneric ? 14 : 13}
                 fill={isGeneric ? '#fff' : info.color}
                 fontWeight="bold">
                 {isGeneric ? '?' : info.label}
               </text>
               {/* 通用港口在圆下方显示 3:1 */}
               {isGeneric && (
-                <text x={ix} y={iy + 22}
-                  textAnchor="middle" fontSize={9} fill="#ccc" fontWeight="bold">
+                <text x={ix} y={iy + 28}
+                  textAnchor="middle" fontSize={11} fill="#ccc" fontWeight="bold">
                   3:1
                 </text>
               )}

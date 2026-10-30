@@ -27,13 +27,13 @@ export default function GameMessages({ messages }: GameMessagesProps) {
   return (
     <div
       ref={scrollRef}
-      className="w-full max-h-28 overflow-y-auto space-y-0.5 px-2 py-1 bg-black/20 rounded-lg backdrop-blur-sm"
+      className="w-full max-h-32 overflow-y-auto space-y-0.5 px-2 py-1 bg-black/20 rounded-lg backdrop-blur-sm"
     >
       {recentMessages.length === 0 ? (
-        <p className="text-xs text-white/40 text-center py-2">暂无消息</p>
+        <p className="text-sm text-white/40 text-center py-2">暂无消息</p>
       ) : (
         recentMessages.map((msg) => (
-          <p key={msg.id} className="text-xs text-white/80 leading-relaxed">
+          <p key={msg.id} className="text-sm text-white/80 leading-relaxed">
             {msg.text}
           </p>
         ))

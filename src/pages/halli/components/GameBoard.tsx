@@ -34,8 +34,9 @@ function getPlayerPositions(playerCount: number, selfIndex: number) {
     const radian = (angle * Math.PI) / 180
 
     // 椭圆半径（水平方向更宽）
-    const rx = 38 // 水平半径百分比
-    const ry = 36 // 垂直半径百分比
+    // 牌区放大后需要更大的半径，避免相邻玩家互相遮挡
+    const rx = 45 // 水平半径百分比
+    const ry = 40 // 垂直半径百分比
 
     const x = 50 + rx * Math.cos(radian)
     const y = 50 + ry * Math.sin(radian)
@@ -77,7 +78,7 @@ export const GameBoard = React.memo(function GameBoard({
   const isMyTurn = currentPlayer?.id === playerId
 
   return (
-    <div className="relative w-full max-w-[700px] aspect-square mx-auto">
+    <div className="relative w-full max-w-[min(760px,calc(100vh_-_220px))] aspect-square mx-auto">
       {/* 中央铃铛 */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
         <BellButton onRing={onRing} disabled={isBellDisabled} />
@@ -90,20 +91,23 @@ export const GameBoard = React.memo(function GameBoard({
           className="absolute z-0"
           style={positions[index]}
         >
-          <PlayerArea
-            player={player}
-            isCurrentTurn={index === currentPlayerIndex}
-            isSelf={player.id === playerId}
-          />
+          {/* 矮屏（如 768p 笔记本）下整体缩小，避免牌区相互重叠 */}
+          <div className="transition-transform [@media(max-height:800px)]:scale-[0.85]">
+            <PlayerArea
+              player={player}
+              isCurrentTurn={index === currentPlayerIndex}
+              isSelf={player.id === playerId}
+            />
+          </div>
         </div>
       ))}
 
       {/* 翻牌按钮（仅自己回合且处于 flip 阶段时显示） */}
       {isMyTurn && phase === 'flip' && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+        <div className="absolute bottom-4 right-4 z-20">
           <button
             onClick={onFlip}
-            className="px-6 py-2 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-medium rounded-full shadow-lg transition-all"
+            className="px-8 py-3 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-medium rounded-full text-lg shadow-lg transition-all"
           >
             翻牌
           </button>

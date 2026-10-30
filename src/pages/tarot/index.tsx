@@ -3,9 +3,13 @@
  * 提供三种占卜模式选择
  */
 
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { clearDailyReading, loadDailyReading } from './storage'
+import type { TarotReading } from './data'
 
 const modes = [
   {
@@ -34,6 +38,19 @@ const modes = [
 export default function TarotHome() {
   const navigate = useNavigate()
 
+  // 当天的每日运势（若已抽取则展示，避免重复抽取）
+  const [daily, setDaily] = useState<TarotReading | null>(null)
+
+  useEffect(() => {
+    setDaily(loadDailyReading()?.reading ?? null)
+  }, [])
+
+  const handleResetDaily = () => {
+    clearDailyReading()
+    setDaily(null)
+    toast.success('今日运势已重置，可以重新抽取')
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-violet-950 flex flex-col">
       {/* 顶部装饰 */}
@@ -53,6 +70,36 @@ export default function TarotHome() {
           </h1>
           <p className="text-purple-300/80 text-lg">探索内心的智慧，聆听宇宙的指引</p>
         </div>
+
+        {/* 当日运势已抽取提示 */}
+        {daily ? (
+          <div className="w-full max-w-lg mb-8 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl shrink-0">{daily.cards[0]?.card.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-amber-100 font-bold text-sm">今日运势已抽取</div>
+                <div className="text-amber-100/70 text-xs truncate">
+                  {daily.cards[0]?.card.name} · {daily.cards[0]?.isReversed ? '逆位' : '正位'}
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-red-400/30 text-red-200 hover:bg-red-900/30 bg-transparent shrink-0"
+                onClick={handleResetDaily}
+              >
+                重置
+              </Button>
+            </div>
+            <Button
+              size="sm"
+              className="mt-3 w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white"
+              onClick={() => navigate('/tarot/reading/single')}
+            >
+              查看今日运势
+            </Button>
+          </div>
+        ) : null}
 
         {/* 模式选择 */}
         <div className="grid gap-6 w-full max-w-lg">

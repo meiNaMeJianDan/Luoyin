@@ -40,13 +40,13 @@ function CountdownBar({ turnStartTime }: { turnStartTime: number }) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
         <div
           className={`h-full ${barColor} rounded-full transition-all duration-100 ease-linear`}
           style={{ width: `${progress}%` }}
         />
       </div>
-      <span className={`text-xs font-mono font-bold min-w-[2ch] ${progress <= 20 ? 'text-red-400 animate-pulse' : 'text-white/70'}`}>
+      <span className={`text-sm font-mono font-bold min-w-[2ch] ${progress <= 20 ? 'text-red-400 animate-pulse' : 'text-white/70'}`}>
         {seconds}
       </span>
     </div>
@@ -114,13 +114,13 @@ export default function UnoGame() {
         <div className="flex items-center justify-between mb-1">
           <DirectionIndicator direction={gameState.direction} />
           {isMyTurn && (
-            <span className="bg-yellow-500/80 text-yellow-900 px-2 py-0.5 rounded-full text-xs font-medium animate-pulse">
+            <span className="bg-yellow-500/80 text-yellow-900 px-3 py-1 rounded-full text-sm font-medium animate-pulse">
               你的回合
             </span>
           )}
         </div>
         {top.length > 0 && (
-          <div className="flex justify-center gap-1.5 flex-wrap">
+          <div className="flex justify-center gap-3 flex-wrap">
             {top.map((p) => (
               <PlayerInfo key={p.id} player={p}
                 isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === p.id}
@@ -131,9 +131,9 @@ export default function UnoGame() {
       </div>
 
       {/* 中间区域：左侧玩家 + 牌堆 + 右侧玩家 */}
-      <div className="flex-1 flex items-center px-2 min-h-0">
+      <div className="flex-1 flex items-center px-3 min-h-0">
         {/* 左侧玩家 */}
-        <div className="w-28 flex-shrink-0 space-y-1.5">
+        <div className="w-48 flex-shrink-0 space-y-3">
           {left.map((p) => (
             <PlayerInfo key={p.id} player={p}
               isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === p.id}
@@ -142,13 +142,13 @@ export default function UnoGame() {
         </div>
 
         {/* 中央牌堆 */}
-        <div className="flex-1 flex items-center justify-center gap-6">
+        <div className="flex-1 flex items-center justify-center gap-10">
           <DiscardPile topCard={gameState.topCard} currentColor={gameState.currentColor} />
           <DrawPile count={gameState.drawPileCount} isMyTurn={isMyTurn && currentPhase === 'playing'} onDraw={drawCard} />
         </div>
 
         {/* 右侧玩家 */}
-        <div className="w-28 flex-shrink-0 space-y-1.5">
+        <div className="w-48 flex-shrink-0 space-y-3">
           {right.map((p) => (
             <PlayerInfo key={p.id} player={p}
               isCurrentTurn={gameState.players[gameState.currentPlayerIndex]?.id === p.id}
@@ -162,11 +162,11 @@ export default function UnoGame() {
         <div className="px-3"><GameMessages messages={messages} /></div>
         {myIndex >= 0 && (
           <div className="px-3">
-            <div className="flex items-center gap-2 text-white/60 text-xs">
+            <div className="flex items-center gap-2 text-white/60 text-base">
               <span className="text-blue-300 font-medium">{gameState.players[myIndex]?.name}（我）</span>
               <span>· {gameState.myHand.length} 张牌</span>
               {gameState.players[myIndex]?.calledUno && (
-                <span className="bg-red-500 text-white px-1 rounded text-[10px]">UNO</span>
+                <span className="bg-red-500 text-white px-1 rounded text-sm">UNO</span>
               )}
             </div>
           </div>

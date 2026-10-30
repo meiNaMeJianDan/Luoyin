@@ -23,19 +23,19 @@ interface DiscardPileProps {
 export default function DiscardPile({ topCard, currentColor }: DiscardPileProps) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <p className="text-xs text-white/70">弃牌堆</p>
+      <p className="text-sm text-white/70">弃牌堆</p>
       <div className="relative">
         {topCard ? (
           <CardView card={topCard} size="lg" />
         ) : (
-          <div className="w-20 h-28 rounded-xl border-2 border-dashed border-white/30 flex items-center justify-center">
-            <span className="text-white/30 text-xs">空</span>
+          <div className="w-28 h-[9.25rem] rounded-xl border-2 border-dashed border-white/30 flex items-center justify-center">
+            <span className="text-white/30 text-sm">空</span>
           </div>
         )}
         {/* 当前颜色指示 */}
         {currentColor && currentColor !== 'wild' && (
           <div
-            className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white shadow ${indicatorColors[currentColor] || ''}`}
+            className={`absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-2 border-white shadow ${indicatorColors[currentColor] || ''}`}
             title={`当前颜色: ${currentColor}`}
           />
         )}

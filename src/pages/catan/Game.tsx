@@ -171,7 +171,7 @@ export default function CatanGame() {
       {/* 主体布局 */}
       <div className="flex-1 flex min-h-0">
         {/* 左侧面板：玩家资源（始终显示） */}
-        <div className="w-[200px] lg:w-[240px] flex-shrink-0 p-2">
+        <div className="w-[176px] lg:w-[208px] flex-shrink-0 p-2">
           <PlayerPanel
             player={currentPlayer}
             resources={gameState.myResources}
@@ -191,7 +191,7 @@ export default function CatanGame() {
         </div>
 
         {/* 右侧面板：游戏信息（始终显示） */}
-        <div className="w-[200px] lg:w-[240px] flex-shrink-0 p-2">
+        <div className="w-[176px] lg:w-[208px] flex-shrink-0 p-2">
           <GameInfoPanel
             gameState={gameState}
             playerId={playerId}

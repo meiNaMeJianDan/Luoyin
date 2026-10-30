@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Gamepad2, Brain, Tent, Baby, BookOpen, ChevronRight } from 'lucide-react';
+import { Gamepad2, Brain, Tent, Baby, BookOpen, ChevronRight, Users } from 'lucide-react';
 import GameCard from '../components/GameCard';
 import { useTrendingGames, useQuickLinks } from '@/hooks/useGameData';
 import { BASE_URL } from '@/api/client';
+import { ONLINE_GAMES } from '@/constant/onlineGames';
 
 const Home = () => {
   // 从 API 获取热门游戏和分类快速链接数据
@@ -52,6 +53,9 @@ const Home = () => {
               <Link to="/beginners" className="btn-bounce bg-black/20 backdrop-blur-sm text-white border border-white/30 px-8 py-3.5 rounded-full font-bold text-lg hover:bg-black/30 transition-all">
                 新手入门指南
               </Link>
+              <Link to="/online" className="btn-bounce bg-yellow-300 text-foreground px-8 py-3.5 rounded-full font-bold text-lg shadow-lg hover:bg-yellow-200 transition-all">
+                🎮 在线开玩
+              </Link>
             </div>
           </div>
         </div>
@@ -85,6 +89,48 @@ const Home = () => {
         )}
       </section>
 
+      {/* Online Games Entry */}
+      <section className="px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">🎮 在线开玩</h2>
+            <p className="text-muted-foreground">创建房间，分享房间号，和朋友实时对战</p>
+          </div>
+          <Link to="/online" className="hidden md:flex items-center text-primary font-bold hover:underline">
+            全部游戏 <ChevronRight size={20} />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+          {ONLINE_GAMES.map((game) => {
+            const Icon = game.icon;
+            return (
+              <Link
+                key={game.key}
+                to={game.path}
+                className="group rounded-3xl overflow-hidden bg-card border border-border shadow-sm hover:shadow-custom hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`h-24 md:h-28 bg-gradient-to-br ${game.gradient} flex items-center justify-center`}>
+                  <Icon size={36} className="text-white/95 group-hover:scale-110 transition-transform duration-300" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-foreground truncate">{game.title}</h3>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                    <Users size={12} /> {game.players}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 flex justify-center md:hidden">
+          <Link to="/online" className="btn-bounce w-full max-w-[300px] text-center bg-accent text-accent-foreground py-3 rounded-full font-bold border border-primary/20">
+            进入在线游戏大厅
+          </Link>
+        </div>
+      </section>
+
       {/* Trending Games */}
       <section className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
@@ -92,7 +138,7 @@ const Home = () => {
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">🔥 热门聚会桌游推荐</h2>
             <p className="text-muted-foreground">新手友好，规则简单，五分钟快速上手！</p>
           </div>
-          <Link to="/categoriesc" className="hidden md:flex items-center text-primary font-bold hover:underline">
+          <Link to="/categories" className="hidden md:flex items-center text-primary font-bold hover:underline">
             查看全部 <ChevronRight size={20} />
           </Link>
         </div>

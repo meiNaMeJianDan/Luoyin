@@ -32,6 +32,10 @@ export interface TarotReading {
   date: string
   mode: 'single' | 'three' | 'celtic'
   cards: DrawnCard[]
+  /** 是否为每日运势（每天固定一抽） */
+  daily?: boolean
+  /** 每日运势对应的日期键 YYYY-MM-DD */
+  dailyKey?: string
 }
 
 // ==================== 大阿卡纳 (22 张) ====================

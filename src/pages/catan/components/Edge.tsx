@@ -49,7 +49,7 @@ export default function Edge({ id, x1, y1, x2, y2, hasRoad, playerColor, valid, 
         <line
           x1={x1} y1={y1} x2={x2} y2={y2}
           stroke={color}
-          strokeWidth={5}
+          strokeWidth={7}
           strokeLinecap="round"
         />
       ) : valid ? (
@@ -58,13 +58,13 @@ export default function Edge({ id, x1, y1, x2, y2, hasRoad, playerColor, valid, 
           <line
             x1={x1} y1={y1} x2={x2} y2={y2}
             stroke="rgba(255,255,255,0.4)"
-            strokeWidth={4}
+            strokeWidth={6}
             strokeLinecap="round"
-            strokeDasharray="4 4"
+            strokeDasharray="6 5"
             className="animate-pulse"
           />
           {/* 扩大点击区域 */}
-          <circle cx={mx} cy={my} r={8} fill="transparent" />
+          <circle cx={mx} cy={my} r={11} fill="transparent" />
         </>
       ) : null}
     </g>

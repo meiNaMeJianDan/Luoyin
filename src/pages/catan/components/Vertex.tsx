@@ -42,30 +42,30 @@ export default function Vertex({ id, x, y, building, playerColor, valid, onClick
       {building === 'city' ? (
         /* 城市：大方块 */
         <rect
-          x={-8}
-          y={-8}
-          width={16}
-          height={16}
-          rx={2}
+          x={-11}
+          y={-11}
+          width={22}
+          height={22}
+          rx={3}
           fill={color}
           stroke="#000"
-          strokeWidth={1.5}
+          strokeWidth={2}
         />
       ) : building === 'settlement' ? (
         /* 村庄：小房子形状 */
         <path
-          d="M0,-8 L7,0 L7,7 L-7,7 L-7,0 Z"
+          d="M0,-11 L10,0 L10,9 L-10,9 L-10,0 Z"
           fill={color}
           stroke="#000"
-          strokeWidth={1.5}
+          strokeWidth={2}
         />
       ) : valid ? (
         /* 可建造位置：半透明圆点 */
         <circle
-          r={6}
+          r={9}
           fill="rgba(255,255,255,0.6)"
           stroke="#fff"
-          strokeWidth={1.5}
+          strokeWidth={2}
           className="animate-pulse"
         />
       ) : null}

@@ -1,16 +1,29 @@
 /**
  * 塔罗占卜页面
  * 根据 URL 参数 mode 决定抽牌数量和牌阵布局
+ *
+ * 每日运势（single）每天只抽一次：抽牌后立即固化到 localStorage，
+ * 当天再次进入会恢复同一张牌；可通过「重置今日运势」重新抽取。
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { drawRandomCards, type DrawnCard, type TarotReading } from './data'
+import {
+  addReading,
+  clearDailyReading,
+  createReadingId,
+  getTodayKey,
+  loadDailyReading,
+  saveDailyReading,
+  type ReadingMode,
+} from './storage'
 import SpreadLayout from './components/SpreadLayout'
 
-type Mode = 'single' | 'three' | 'celtic'
+type Mode = ReadingMode
 
 const modeConfig: Record<Mode, { title: string; count: number }> = {
   single: { title: '每日运势', count: 1 },
@@ -33,25 +46,6 @@ function getPositionName(mode: Mode, index: number): string {
   return '每日运势'
 }
 
-/** 保存占卜记录到 localStorage */
-function saveReading(mode: Mode, cards: DrawnCard[]) {
-  const reading: TarotReading = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    date: new Date().toISOString(),
-    mode,
-    cards,
-  }
-  try {
-    const raw = localStorage.getItem('tarot_history')
-    const history: TarotReading[] = raw ? JSON.parse(raw) : []
-    history.unshift(reading)
-    // 最多保留 50 条
-    localStorage.setItem('tarot_history', JSON.stringify(history.slice(0, 50)))
-  } catch {
-    // localStorage 不可用时静默失败
-  }
-}
-
 export default function TarotReading() {
   const { mode: rawMode } = useParams<{ mode: string }>()
   const navigate = useNavigate()
@@ -66,6 +60,49 @@ export default function TarotReading() {
   const [flippedIndices, setFlippedIndices] = useState<Set<number>>(new Set())
   const [isStarted, setIsStarted] = useState(false)
   const [allRevealed, setAllRevealed] = useState(false)
+  const [isDailyRestored, setIsDailyRestored] = useState(false)
+
+  // 防止同一组牌被重复写入历史（每日运势在抽牌时已保存）
+  const savedRef = useRef(false)
+
+  /** 重置当前页面的展示状态 */
+  const resetView = useCallback(() => {
+    setCards([])
+    setFlippedIndices(new Set())
+    setIsStarted(false)
+    setAllRevealed(false)
+    setIsDailyRestored(false)
+    savedRef.current = false
+  }, [])
+
+  // 进入页面 / 切换模式时：每日运势恢复当天已抽的牌，保证同一天结果一致
+  useEffect(() => {
+    if (mode === 'single') {
+      const daily = loadDailyReading()
+      if (daily) {
+        setCards(daily.reading.cards)
+        setFlippedIndices(new Set())
+        setIsStarted(true)
+        setAllRevealed(false)
+        setIsDailyRestored(true)
+        savedRef.current = true
+        return
+      }
+    }
+    resetView()
+  }, [mode, resetView])
+
+  /** 非每日运势的牌阵：全部翻开后写入历史 */
+  const saveOnce = useCallback((currentCards: DrawnCard[]) => {
+    if (savedRef.current || currentCards.length === 0) return
+    savedRef.current = true
+    addReading({
+      id: createReadingId(),
+      date: new Date().toISOString(),
+      mode,
+      cards: currentCards,
+    })
+  }, [mode])
 
   // 开始占卜
   const handleStart = useCallback(() => {
@@ -75,10 +112,29 @@ export default function TarotReading() {
       ...dc,
       position: getPositionName(mode, i),
     }))
+
     setCards(withPositions)
     setIsStarted(true)
     setFlippedIndices(new Set())
     setAllRevealed(false)
+    setIsDailyRestored(false)
+
+    if (mode === 'single') {
+      // 每日运势：抽牌即固化，并写入历史记录
+      const reading: TarotReading = {
+        id: createReadingId(),
+        date: new Date().toISOString(),
+        mode,
+        cards: withPositions,
+        daily: true,
+        dailyKey: getTodayKey(),
+      }
+      saveDailyReading(reading)
+      addReading(reading)
+      savedRef.current = true
+    } else {
+      savedRef.current = false
+    }
   }, [config.count, mode])
 
   // 点击翻牌
@@ -92,12 +148,12 @@ export default function TarotReading() {
         // 延迟标记全部翻开，让最后一张动画完成
         setTimeout(() => {
           setAllRevealed(true)
-          saveReading(mode, cards)
+          saveOnce(cards)
         }, 600)
       }
       return next
     })
-  }, [cards, mode])
+  }, [cards, saveOnce])
 
   // 一键翻开所有牌
   const handleRevealAll = useCallback(() => {
@@ -105,17 +161,21 @@ export default function TarotReading() {
     setFlippedIndices(all)
     setTimeout(() => {
       setAllRevealed(true)
-      saveReading(mode, cards)
+      saveOnce(cards)
     }, 600)
-  }, [cards, mode])
+  }, [cards, saveOnce])
 
-  // 重新占卜
+  // 重新占卜（三张 / 凯尔特十字）
   const handleReset = useCallback(() => {
-    setCards([])
-    setFlippedIndices(new Set())
-    setIsStarted(false)
-    setAllRevealed(false)
-  }, [])
+    resetView()
+  }, [resetView])
+
+  // 重置今日运势：清除当天的固定记录，允许重新抽取
+  const handleResetDaily = useCallback(() => {
+    clearDailyReading()
+    resetView()
+    toast.success('今日运势已重置，可以重新抽取')
+  }, [resetView])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-violet-950">
@@ -124,16 +184,27 @@ export default function TarotReading() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-purple-100">🔮 {config.title}</h1>
           <p className="text-purple-300/60 mt-2 text-sm">
-            {isStarted ? '点击牌面翻开查看' : '准备好后点击开始占卜'}
+            {isStarted
+              ? (isDailyRestored ? '今日运势已抽取，每天固定' : '点击牌面翻开查看')
+              : '准备好后点击开始占卜'}
           </p>
         </div>
+
+        {/* 每日运势已固定的提示 */}
+        {isStarted && isDailyRestored ? (
+          <div className="mx-auto mb-6 max-w-xl rounded-xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-center text-sm text-amber-100/80">
+            ✨ 今天的运势已经固定，再次进入仍会是同一张牌。需要重新抽取请点击底部「重置今日运势」。
+          </div>
+        ) : null}
 
         {/* 未开始 — 显示开始按钮 */}
         {!isStarted ? (
           <div className="flex flex-col items-center gap-6 py-16">
             <div className="text-6xl animate-pulse">🔮</div>
             <p className="text-purple-200/70 text-center max-w-md">
-              静下心来，在心中默念你想要了解的问题，然后点击下方按钮开始占卜。
+              {mode === 'single'
+                ? '静下心来，在心中默念你想要了解的问题。每日运势每天只抽一次，抽到后将固定保留至明天。'
+                : '静下心来，在心中默念你想要了解的问题，然后点击下方按钮开始占卜。'}
             </p>
             <Button
               size="lg"
@@ -232,13 +303,32 @@ export default function TarotReading() {
         ) : null}
 
         {/* 底部操作按钮 */}
-        <div className="flex justify-center gap-4 mt-10 pb-8">
+        <div className="flex flex-wrap justify-center gap-4 mt-10 pb-8">
+          {mode === 'single' ? (
+            cards.length > 0 ? (
+              <Button
+                variant="outline"
+                className="border-red-400/30 text-red-200 hover:bg-red-900/30 bg-transparent"
+                onClick={handleResetDaily}
+              >
+                🔄 重置今日运势
+              </Button>
+            ) : null
+          ) : (
+            <Button
+              variant="outline"
+              className="border-purple-400/30 text-purple-200 hover:bg-purple-800/30 bg-transparent"
+              onClick={handleReset}
+            >
+              🔄 重新占卜
+            </Button>
+          )}
           <Button
             variant="outline"
             className="border-purple-400/30 text-purple-200 hover:bg-purple-800/30 bg-transparent"
-            onClick={handleReset}
+            onClick={() => navigate('/tarot/history')}
           >
-            🔄 重新占卜
+            📜 占卜历史
           </Button>
           <Button
             variant="outline"

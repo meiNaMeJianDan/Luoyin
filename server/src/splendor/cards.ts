@@ -3,7 +3,7 @@
 // 基于璀璨宝石桌游官方数据
 // ============================================================
 
-import type { DevelopmentCard, Noble, GemColor } from './types';
+import type { DevelopmentCard, Noble, GemColor } from './types.js';
 
 // 辅助函数：创建宝石成本映射
 function cost(diamond: number, sapphire: number, emerald: number, ruby: number, onyx: number) {

@@ -60,7 +60,7 @@ export default function HalliGame() {
 
       {/* 中央：游戏面板 */}
       <div className="flex-1 flex items-center justify-center min-h-0 px-4 py-2">
-        <div className="flex gap-4 items-start w-full max-w-[900px]">
+        <div className="flex gap-4 items-start w-full max-w-[1100px]">
           {/* 游戏主面板 */}
           <div className="flex-1 min-w-0">
             <GameBoard
@@ -72,7 +72,7 @@ export default function HalliGame() {
           </div>
 
           {/* 右侧：游戏日志 */}
-          <div className="hidden lg:block flex-shrink-0 w-64">
+          <div className="hidden lg:block flex-shrink-0 w-72">
             <GameLog log={gameState.log} />
           </div>
         </div>

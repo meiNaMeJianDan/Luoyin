@@ -39,7 +39,7 @@ export default function HandCards({
 
   return (
     <div className="w-full overflow-x-auto pb-2">
-      <div className="flex items-end justify-center min-w-min px-4" style={{ gap: cards.length > 10 ? '-0.5rem' : '0.25rem' }}>
+      <div className="flex items-end justify-center min-w-min px-4" style={{ gap: cards.length > 10 ? '-1rem' : '0.625rem' }}>
         {cards.map((card) => {
           const isPlayable = isMyTurn && playableCardIds.includes(card.id)
           return (
@@ -48,7 +48,7 @@ export default function HandCards({
               className={`transition-all duration-300 ease-out flex-shrink-0 ${
                 isPlayable ? 'hover:-translate-y-4 hover:z-10' : ''
               }`}
-              style={{ marginBottom: isPlayable ? '4px' : '0' }}
+              style={{ marginBottom: isPlayable ? '6px' : '0' }}
             >
               <CardView
                 card={card}

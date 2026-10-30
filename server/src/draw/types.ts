@@ -49,6 +49,8 @@ export interface GameConfig {
   rounds: number;
   /** 每回合时间（秒）：60 / 90 / 120 */
   turnDuration: number;
+  /** 是否启用词语提示（开启则按时间自动揭示字符） */
+  hintsEnabled: boolean;
 }
 
 // ============================================================

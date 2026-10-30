@@ -86,11 +86,14 @@ export default defineConfig({
     host: true,
     proxy: {
       '/socket.io': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:5050',
         ws: true,
       },
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:5050',
+      },
+      '/images': {
+        target: 'http://localhost:5050',
       },
     },
   },

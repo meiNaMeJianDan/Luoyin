@@ -79,13 +79,13 @@ export const TurnIndicator = React.memo(function TurnIndicator({
         : 'bg-blue-500'
 
   return (
-    <div className="w-full max-w-md mx-auto px-4 py-2">
+    <div className="w-full max-w-lg mx-auto px-4 py-2">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-base font-medium text-gray-700">
           {currentPlayerName} · {phaseLabel}
         </span>
         {duration > 0 && (
-          <span className="text-xs text-gray-500">
+          <span className="text-sm text-gray-500">
             {Math.ceil((progress / 100) * (duration / 1000))}s
           </span>
         )}
@@ -93,7 +93,7 @@ export const TurnIndicator = React.memo(function TurnIndicator({
 
       {/* 进度条 */}
       {duration > 0 && (
-        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-100 ${barColor}`}
             style={{ width: `${progress}%` }}

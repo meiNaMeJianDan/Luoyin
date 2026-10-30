@@ -37,7 +37,7 @@ export const PlayerArea = React.memo(function PlayerArea({
 
   return (
     <div
-      className={`relative rounded-xl border-2 p-3 transition-all duration-300 ${borderClass} ${
+      className={`relative rounded-xl border-2 p-4 transition-all duration-300 ${borderClass} ${
         isEliminated ? 'opacity-50 grayscale bg-gray-100' : 'bg-white'
       }`}
     >
@@ -53,7 +53,7 @@ export const PlayerArea = React.memo(function PlayerArea({
       {/* 玩家昵称 */}
       <div className="flex items-center justify-between mb-2">
         <span
-          className={`text-sm font-medium truncate max-w-[80px] ${
+          className={`text-base font-medium truncate max-w-[110px] ${
             isSelf ? 'text-blue-600' : 'text-gray-700'
           }`}
         >
@@ -61,7 +61,7 @@ export const PlayerArea = React.memo(function PlayerArea({
           {isSelf && ' (我)'}
         </span>
         {player.isAI && (
-          <span className="text-xs bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded">
+          <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">
             AI
           </span>
         )}
@@ -76,8 +76,8 @@ export const PlayerArea = React.memo(function PlayerArea({
       <div className="flex items-center gap-2">
         {/* Draw_Pile 剩余牌数 */}
         <div className="flex flex-col items-center">
-          <div className="w-14 h-20 rounded-lg border-2 border-dashed border-indigo-300 bg-indigo-50 flex items-center justify-center">
-            <span className="text-indigo-600 font-bold text-lg">
+          <div className="w-16 h-24 rounded-lg border-2 border-dashed border-indigo-300 bg-indigo-50 flex items-center justify-center">
+            <span className="text-indigo-600 font-bold text-xl">
               {player.drawPileCount}
             </span>
           </div>

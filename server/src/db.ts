@@ -1,100 +1,84 @@
-// 数据库连接与初始化模块
-// 使用 better-sqlite3 创建 SQLite 数据库连接，并初始化所有表结构
+// 数据库连接与查询封装模块
+// 使用 mysql2 连接池访问 MySQL，并提供 Promise 化的查询辅助函数
 
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mysql from 'mysql2/promise';
+import type { Pool, PoolConnection, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 数据库文件路径：server/data.db
-const DB_PATH = path.join(__dirname, '..', 'data.db');
-
-let db: Database.Database | null = null;
-
-/** 初始化数据库表结构 */
-function initTables(database: Database.Database): void {
-  database.exec(`
-    -- 游戏基础信息表
-    CREATE TABLE IF NOT EXISTS games (
-      id INTEGER PRIMARY KEY,
-      title TEXT NOT NULL,
-      type TEXT NOT NULL,
-      players TEXT NOT NULL,
-      time TEXT NOT NULL,
-      image TEXT NOT NULL,
-      difficulty TEXT NOT NULL,
-      tags TEXT NOT NULL,
-      is_hot INTEGER NOT NULL DEFAULT 0,
-      rank INTEGER,
-      comment TEXT,
-      is_trending INTEGER NOT NULL DEFAULT 0
-    );
-
-    -- 游戏详情表
-    CREATE TABLE IF NOT EXISTS game_details (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      game_id INTEGER NOT NULL UNIQUE,
-      introduction TEXT NOT NULL,
-      objective TEXT NOT NULL,
-      victory_conditions TEXT NOT NULL,
-      gameplay_steps TEXT NOT NULL,
-      tips TEXT NOT NULL,
-      FOREIGN KEY (game_id) REFERENCES games(id)
-    );
-
-    -- 分类筛选选项表
-    CREATE TABLE IF NOT EXISTS category_options (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      key TEXT NOT NULL UNIQUE,
-      value TEXT NOT NULL
-    );
-
-    -- 分类快速链接表
-    CREATE TABLE IF NOT EXISTS quick_links (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      icon TEXT NOT NULL,
-      color TEXT NOT NULL,
-      link TEXT NOT NULL
-    );
-
-    -- 新手常见问题表
-    CREATE TABLE IF NOT EXISTS faqs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      question TEXT NOT NULL,
-      answer TEXT NOT NULL,
-      sort_order INTEGER NOT NULL DEFAULT 0
-    );
-
-    -- 新手指南步骤表
-    CREATE TABLE IF NOT EXISTS guide_steps (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      step TEXT NOT NULL,
-      description TEXT NOT NULL,
-      sort_order INTEGER NOT NULL DEFAULT 0
-    );
-  `);
+/** 读取环境变量并转数字，缺失时使用默认值 */
+function envNumber(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-/** 获取数据库实例，首次调用时创建连接并初始化表结构 */
-export function getDb(): Database.Database {
-  if (db) {
-    return db;
-  }
+/** 全局连接池，首次导入时创建 */
+const pool: Pool = mysql.createPool({
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: envNumber('DB_PORT', 3306),
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '123456',
+  database: process.env.DB_NAME || 'boardgame',
+  waitForConnections: true,
+  connectionLimit: envNumber('DB_POOL_SIZE', 10),
+  queueLimit: 0,
+  charset: 'utf8mb4',
+  // 让 COUNT(*) 等结果以数字返回，并保持 DATETIME 为字符串
+  dateStrings: true,
+});
 
+/** 初始化数据库：验证连接可用，失败时退出进程 */
+export async function initDb(): Promise<void> {
+  let connection: PoolConnection | null = null;
   try {
-    db = new Database(DB_PATH);
-    // 启用 WAL 模式提升并发读取性能
-    db.pragma('journal_mode = WAL');
-    // 启用外键约束
-    db.pragma('foreign_keys = ON');
-    // 初始化表结构
-    initTables(db);
-    return db;
+    connection = await pool.getConnection();
+    await connection.ping();
+    console.log('数据库连接成功');
   } catch (error) {
     console.error('数据库连接失败:', error);
     process.exit(1);
+  } finally {
+    connection?.release();
   }
 }
+
+/** 查询多行 */
+export async function query<T = RowDataPacket>(sql: string, params: unknown[] = []): Promise<T[]> {
+  const [rows] = await pool.query(sql, params);
+  return rows as T[];
+}
+
+/** 查询单行，不存在时返回 null */
+export async function queryOne<T = RowDataPacket>(
+  sql: string,
+  params: unknown[] = [],
+): Promise<T | null> {
+  const rows = await query<T>(sql, params);
+  return rows.length > 0 ? rows[0] : null;
+}
+
+/** 执行写操作，返回受影响行数与自增 ID */
+export async function execute(sql: string, params: unknown[] = []): Promise<ResultSetHeader> {
+  const [result] = await pool.query<ResultSetHeader>(sql, params);
+  return result;
+}
+
+/** 在事务中执行一组操作，异常时自动回滚 */
+export async function withTransaction<T>(
+  fn: (connection: PoolConnection) => Promise<T>,
+): Promise<T> {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    const result = await fn(connection);
+    await connection.commit();
+    return result;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+export { pool };

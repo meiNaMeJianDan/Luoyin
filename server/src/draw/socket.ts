@@ -159,45 +159,48 @@ function startTurnTimers(io: SocketIOServer, room: DrawRoom): void {
     handleTurnEnd(io, currentRoom);
   }, turnDurationMs);
 
-  // 第一次提示揭示（40% 时间点）
-  const hint1Delay = Math.floor(turnDurationMs * HINT_REVEAL_1_PERCENT);
-  startTimer(room.id, 'hint_1', () => {
-    const currentRoom = getRoom(room.id);
-    if (!currentRoom?.gameState || currentRoom.gameState.phase !== 'drawing') return;
+  // 提示揭示：房主关闭「词语提示」时不注册任何提示计时器
+  if (room.gameState.config.hintsEnabled) {
+    // 第一次提示揭示（40% 时间点）
+    const hint1Delay = Math.floor(turnDurationMs * HINT_REVEAL_1_PERCENT);
+    startTimer(room.id, 'hint_1', () => {
+      const currentRoom = getRoom(room.id);
+      if (!currentRoom?.gameState || currentRoom.gameState.phase !== 'drawing') return;
 
-    currentRoom.gameState = revealHintChar(currentRoom.gameState);
+      currentRoom.gameState = revealHintChar(currentRoom.gameState);
 
-    // 广播提示更新
-    if (currentRoom.gameState.hintState) {
-      const revealedSet = new Set(currentRoom.gameState.hintState.revealedIndices);
-      const hint = currentRoom.gameState.hintState.chars.map((char, index) =>
-        revealedSet.has(index) ? char : '_',
-      );
-      broadcastToRoom(io, currentRoom, 'draw:hint_update', { hint });
-    }
+      // 广播提示更新
+      if (currentRoom.gameState.hintState) {
+        const revealedSet = new Set(currentRoom.gameState.hintState.revealedIndices);
+        const hint = currentRoom.gameState.hintState.chars.map((char, index) =>
+          revealedSet.has(index) ? char : '_',
+        );
+        broadcastToRoom(io, currentRoom, 'draw:hint_update', { hint });
+      }
 
-    broadcastGameState(io, currentRoom);
-  }, hint1Delay);
+      broadcastGameState(io, currentRoom);
+    }, hint1Delay);
 
-  // 第二次提示揭示（70% 时间点）
-  const hint2Delay = Math.floor(turnDurationMs * HINT_REVEAL_2_PERCENT);
-  startTimer(room.id, 'hint_2', () => {
-    const currentRoom = getRoom(room.id);
-    if (!currentRoom?.gameState || currentRoom.gameState.phase !== 'drawing') return;
+    // 第二次提示揭示（70% 时间点）
+    const hint2Delay = Math.floor(turnDurationMs * HINT_REVEAL_2_PERCENT);
+    startTimer(room.id, 'hint_2', () => {
+      const currentRoom = getRoom(room.id);
+      if (!currentRoom?.gameState || currentRoom.gameState.phase !== 'drawing') return;
 
-    currentRoom.gameState = revealHintChar(currentRoom.gameState);
+      currentRoom.gameState = revealHintChar(currentRoom.gameState);
 
-    // 广播提示更新
-    if (currentRoom.gameState.hintState) {
-      const revealedSet = new Set(currentRoom.gameState.hintState.revealedIndices);
-      const hint = currentRoom.gameState.hintState.chars.map((char, index) =>
-        revealedSet.has(index) ? char : '_',
-      );
-      broadcastToRoom(io, currentRoom, 'draw:hint_update', { hint });
-    }
+      // 广播提示更新
+      if (currentRoom.gameState.hintState) {
+        const revealedSet = new Set(currentRoom.gameState.hintState.revealedIndices);
+        const hint = currentRoom.gameState.hintState.chars.map((char, index) =>
+          revealedSet.has(index) ? char : '_',
+        );
+        broadcastToRoom(io, currentRoom, 'draw:hint_update', { hint });
+      }
 
-    broadcastGameState(io, currentRoom);
-  }, hint2Delay);
+      broadcastGameState(io, currentRoom);
+    }, hint2Delay);
+  }
 }
 
 // ============================================================
@@ -473,6 +476,8 @@ export function initDrawSocket(io: SocketIOServer): void {
         const gameConfig: GameConfig = {
           rounds: config?.rounds && [1, 2, 3].includes(config.rounds) ? config.rounds : 2,
           turnDuration: config?.turnDuration && [60, 90, 120].includes(config.turnDuration) ? config.turnDuration : 90,
+          // 兼容旧客户端：未传时默认开启提示
+          hintsEnabled: typeof config?.hintsEnabled === 'boolean' ? config.hintsEnabled : true,
         };
 
         // 初始化游戏状态

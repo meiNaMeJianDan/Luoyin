@@ -238,42 +238,13 @@ const GameDetail = () => {
             </>
           )}
 
-          {/* 如果没有详细信息，显示默认内容 */}
+          {/* 如果没有详细信息，显示“筹备中”占位，而不是报错 */}
           {!gameDetails && (
-            <>
-              {/* Section 1 */}
-              <section>
-                <h2 className="text-2xl font-bold flex items-center gap-2 mb-6">
-                  <span className="bg-primary text-primary-foreground w-8 h-8 rounded-xl flex items-center justify-center text-xl">1</span>
-                  游戏目标与获胜条件
-                </h2>
-                <div className="bg-card rounded-3xl p-6 md:p-8 border border-border shadow-sm text-lg text-foreground leading-relaxed">
-                  <p className="text-center">该游戏的详细信息正在完善中...</p>
-                </div>
-              </section>
-
-              {/* Section 2 */}
-              <section>
-                <h2 className="text-2xl font-bold flex items-center gap-2 mb-6">
-                  <span className="bg-secondary text-secondary-foreground w-8 h-8 rounded-xl flex items-center justify-center text-xl">2</span>
-                  核心玩法步骤
-                </h2>
-                <div className="bg-card rounded-3xl p-6 md:p-8 border border-border shadow-sm text-lg text-foreground leading-relaxed">
-                  <p className="text-center">该游戏的详细信息正在完善中...</p>
-                </div>
-              </section>
-
-              {/* Section 3 */}
-              <section>
-                <h2 className="text-2xl font-bold flex items-center gap-2 mb-6">
-                  <span className="bg-yellow-400 text-white w-8 h-8 rounded-xl flex items-center justify-center text-xl">3</span>
-                  新手小贴士
-                </h2>
-                <div className="bg-accent/50 rounded-3xl p-6 md:p-8 border border-primary/10">
-                  <p className="text-center">该游戏的详细信息正在完善中...</p>
-                </div>
-              </section>
-            </>
+            <section className="bg-card rounded-3xl p-10 md:p-12 border border-border shadow-sm text-center">
+              <Clock className="mx-auto text-muted-foreground mb-4" size={48} />
+              <h2 className="text-2xl font-bold mb-3">桌游详情正在筹备中。。。</h2>
+              <p className="text-muted-foreground">攻略内容正在整理，敬请期待！</p>
+            </section>
           )}
         </div>
       </div>

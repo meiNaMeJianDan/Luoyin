@@ -8,6 +8,7 @@ const Header = () => {
 
   const navLinks = [
     { name: '首页', path: '/' },
+    { name: '在线游戏', path: '/online' },
     { name: '桌游分类', path: '/categories' },
     { name: '热门推荐', path: '/trending' },
     { name: '新手入门', path: '/beginners' },
@@ -32,29 +33,29 @@ const Header = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`text-lg font-medium transition-colors hover-wiggle ${
+              className={`text-base xl:text-lg font-medium transition-colors hover-wiggle ${
                 isActive(link.path) ? 'text-primary' : 'text-muted-foreground hover:text-primary'
               }`}
             >
               {link.name}
             </Link>
           ))}
-          <Link 
-            to="/categories" 
-            className="btn-bounce bg-primary text-primary-foreground px-6 py-2.5 rounded-full font-bold shadow-custom hover:bg-primary/90 transition-colors"
+          <Link
+            to="/categories"
+            className="btn-bounce bg-primary text-primary-foreground px-5 xl:px-6 py-2.5 rounded-full font-bold shadow-custom hover:bg-primary/90 transition-colors"
           >
             找桌游
           </Link>
         </nav>
 
         {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden p-2 text-foreground"
+        <button
+          className="lg:hidden p-2 text-foreground"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -63,7 +64,7 @@ const Header = () => {
 
       {/* Mobile Navigation Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-white border-b border-border shadow-lg py-4 px-4 flex flex-col gap-4">
+        <div className="lg:hidden absolute top-20 left-0 w-full bg-white border-b border-border shadow-lg py-4 px-4 flex flex-col gap-4">
           {navLinks.map((link) => (
             <Link
               key={link.path}

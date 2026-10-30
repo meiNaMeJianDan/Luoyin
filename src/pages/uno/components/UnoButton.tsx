@@ -37,9 +37,9 @@ export default function UnoButton({ visible, onCallUno }: UnoButtonProps) {
       }}
       className={cn(
         'fixed bottom-32 right-4 z-50',
-        'w-16 h-16 rounded-full',
+        'w-20 h-20 rounded-full',
         'bg-red-500 hover:bg-red-600 active:scale-90',
-        'text-white font-black text-lg',
+        'text-white font-black text-xl',
         'shadow-lg shadow-red-500/50',
         'animate-bounce transition-transform',
         'flex items-center justify-center',

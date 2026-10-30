@@ -69,9 +69,9 @@ export function useGameById(id: number) {
   });
 }
 
-/** 根据游戏 ID 获取游戏详情 */
+/** 根据游戏 ID 获取游戏详情（未录入时 data 为 null） */
 export function useGameDetails(id: number) {
-  return useQuery<GameDetail, Error>({
+  return useQuery<GameDetail | null, Error>({
     queryKey: ['games', id, 'details'],
     queryFn: () => fetchGameDetails(id),
     enabled: id > 0,

@@ -18,8 +18,9 @@
 
     /* 其他 */
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
+    /* 服务端应用无需输出 .d.ts；关闭可避免 pnpm 依赖布局下的 TS2742 报错 */
+    "declaration": false,
+    "declarationMap": false,
     "sourceMap": true
   },
   "include": ["src/**/*.ts"],
